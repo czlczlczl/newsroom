@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.newsroom.dao.SearchMapper">
+
+    <!--<cache type="com.example.newsroom.redis.RedisCache" eviction="LRU"-->
+           <!--flushInterval="60000"-->
+           <!--size="1024"-->
+           <!--readOnly="true"/>-->
+
+    <select id="GetStandard" resultType="Hashmap">
+        SELECT id, `year`, standard FROM newsroominfo;
+    </select>
+
+    <select id="SearchCountByDate" parameterType="HashMap" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM articles
+        <where>
+            <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') = DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+        </where>
+        order by date_pub desc;
+    </select>
+
+    <select id="SearchByDate" parameterType="HashMap" resultType="Hashmap">
+        SELECT * FROM articles
+        <where>
+            <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') = DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+        </where>
+        order by date_pub desc limit #{page},10;
+    </select>
+
+    <select id="SearchContent" parameterType="int" resultType="Hashmap">
+        SELECT content FROM newsroominfo WHERE `year` = #{year};
+    </select>
+
+    <select id="SearchCountByKey" resultType="java.lang.Integer">
+        <if test="type != 2 and type != 5">
+            SELECT COUNT(*) FROM articles AS a
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <if test="type == 1">/*关键词按title*/
+                    <bind name = "title" value = "'%' + keyword + '%'"/>
+                    a.title like #{title}
+                </if>
+                <if test="type == 3">/*关键词按keyword_cn*/
+                    <bind name = "keyword_cn" value = "'%' + keyword + '%'"/>
+                    a.keyword1_cn like #{keyword_cn} OR a.keyword2_cn like #{keyword_cn} OR a.keyword3_cn like #{keyword_cn} OR a.keyword4_cn like #{keyword_cn}
+                </if>
+                <if test="type == 4">/*关键词按keyword_en*/
+                    <bind name = "keyword_en" value = "'%' + keyword + '%'"/>
+                    a.keyword1_en like #{keyword_en} OR a.keyword2_en like #{keyword_en} OR a.keyword3_en like #{keyword_en} OR a.keyword4_en like #{keyword_en}
+                </if>
+                <if test="type == 6">/*关键词按summary_cn*/
+                    <bind name = "summary_cn" value = "'%' + keyword + '%'"/>
+                    a.summary_cn like #{summary_cn}
+                </if>
+                <if test="type == 7">/*关键词按summary_en*/
+                    <bind name = "summary_en" value = "'%' + keyword + '%'"/>
+                    a.summary_en like #{summary_en}
+                </if>
+            </where>
+        </if>
+        <if test="type == 2">/*关键词按academicsec*/
+            SELECT COUNT(*) FROM articles AS a LEFT JOIN type_academicsec AS b ON  a.writer_id = b.id
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <bind name = "academicsec" value = "'%' + keyword + '%'"/>
+                b.academicsec = #{academicsec}
+            </where>
+        </if>
+        <if test="type == 5">/*关键词按writer*/
+            SELECT COUNT(*) FROM articles AS a LEFT JOIN authors AS b ON  a.writer_id = b.id
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <bind name = "writer" value = "'%' + keyword + '%'"/>
+                b.name = #{writer}
+            </where>
+        </if>
+    </select>
+
+    <select id="SearchByKey" resultType="Hashmap">
+        <if test="type != 2 and type != 5">
+            SELECT * FROM articles AS a
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <if test="type == 1">/*关键词按title*/
+                    <bind name = "title" value = "'%' + keyword + '%'"/>
+                    a.title like #{title}
+                </if>
+                <if test="type == 3">/*关键词按keyword_cn*/
+                    <bind name = "keyword_cn" value = "'%' + keyword + '%'"/>
+                    a.keyword1_cn like #{keyword_cn} OR a.keyword2_cn like #{keyword_cn} OR a.keyword3_cn like #{keyword_cn} OR a.keyword4_cn like #{keyword_cn}
+                </if>
+                <if test="type == 4">/*关键词按keyword_en*/
+                    <bind name = "keyword_en" value = "'%' + keyword + '%'"/>
+                    a.keyword1_en like #{keyword_en} OR a.keyword2_en like #{keyword_en} OR a.keyword3_en like #{keyword_en} OR a.keyword4_en like #{keyword_en}
+                </if>
+                <if test="type == 6">/*关键词按summary_cn*/
+                    <bind name = "summary_cn" value = "'%' + keyword + '%'"/>
+                    a.summary_cn like #{summary_cn}
+                </if>
+                <if test="type == 7">/*关键词按summary_en*/
+                    <bind name = "summary_en" value = "'%' + keyword + '%'"/>
+                    a.summary_en like #{summary_en}
+                </if>
+            </where>
+        </if>
+        <if test="type == 2">/*关键词按academicsec*/
+            SELECT * FROM articles AS a LEFT JOIN type_academicsec AS b ON  a.writer_id = b.id
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <bind name = "academicsec" value = "'%' + keyword + '%'"/>
+                b.academicsec = #{academicsec}
+            </where>
+        </if>
+        <if test="type == 5">/*关键词按writer*/
+            SELECT * FROM articles AS a LEFT JOIN authors AS b ON  a.writer_id = b.id
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') >=DATE_FORMAT(#{start}, '%Y-%m-%d %H:%T:%s')   ]]>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <=DATE_FORMAT(#{end} , '%Y-%m-%d %H:%T:%s')    ]]>
+                and
+                <bind name = "writer" value = "'%' + keyword + '%'"/>
+                b.name = #{writer}
+            </where>
+        </if>
+    </select>
+</mapper>
