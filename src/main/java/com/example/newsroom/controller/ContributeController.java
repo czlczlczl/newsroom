@@ -966,10 +966,10 @@ public class ContributeController {
             task.setStat(1);
         }
         else if(task.getStat() == 5){
-            if(tmp % 6 == 0){
+            if(tmp % 2 == 0 && tmp != 2){
                 task.setStat(7);
             }
-            else if(tmp % 3 == 0){
+            else if(tmp % 2 != 0 || tmp == 2){
                 task.setStat(1);
             }
         }
@@ -1159,8 +1159,8 @@ public class ContributeController {
 
     /**
      *
-     //     * @param id_role
-     //     * @param role
+//     * @param id_role
+//     * @param role
      * @param _begin
      * @param _end
      * @param session
