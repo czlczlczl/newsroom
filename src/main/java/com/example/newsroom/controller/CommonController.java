@@ -207,7 +207,7 @@ public class CommonController {
     /**
      * 16. 获得证书列表
      */
-    @GetMapping(value = "/getcertificat")
+    @GetMapping(value = "/getcertificatlist")
     public Object GetCertificate(){
         return commonService.GetCertificate();
     }
