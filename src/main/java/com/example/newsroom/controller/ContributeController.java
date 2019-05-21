@@ -343,15 +343,17 @@ public class ContributeController {
 
     /**
      *
-     * @param flag
-     * @param page
+     * @param all
      * @param session
      * @return
      */
     @PostMapping(value = "/task")
-    public Object getTask(/*@RequestParam(value = "id_role") int id_role,@RequestParam(value = "role")int role,*/@RequestParam(value = "stat") int stat,@RequestParam(value = "flag") int flag, @RequestParam(value = "page") int page,HttpSession session){
+    public Object getTask(@RequestBody All all,HttpSession session){
         int id_role = (int)session.getAttribute("id");
         int role = (int)session.getAttribute("role");
+        int stat = all.getStat();
+        int flag = all.getFlag();
+        int page = all.getPage();
         Map<String,Object> map = new HashMap<>();
         Integer result = 1;
         Map<String,Object> data = new HashMap<>();
@@ -1159,17 +1161,17 @@ public class ContributeController {
 
     /**
      *
-//     * @param id_role
-//     * @param role
-     * @param _begin
-     * @param _end
+     *
+     * @param all
      * @param session
      * @return
      */
     @PostMapping(value = "/workload")
-    public Object computeWorkload(/*@RequestParam(value = "id_role") int id_role, @RequestParam(value = "role") int role,*/@RequestParam(value = "begin") String _begin,@RequestParam(value = "end") String _end,HttpSession session){
+    public Object computeWorkload(@RequestBody All all,HttpSession session){
         int id_role = (int)session.getAttribute("id");
         int role = (int)session.getAttribute("role");
+        String _begin = all.getBegin();
+        String _end = all.getEnd();
         Map<String,Object> map = new HashMap<>();
         Integer result = 0;
         Map<String,Object> data = new HashMap<>();

@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.newsroom.dao.AdminMapper">
+
+    <insert id="CreateAnnouncement">
+        INSERT INTO announcements
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="announcement.title != null">
+                title,
+            </if>
+            <if test="announcement.content != null">
+                content,
+            </if>
+            <if test="announcement.upload != null">
+                upload,
+            </if>
+            <if test="announcement.date_pub != null">
+                date_pub,
+            </if>
+            <if test="announcement.pic != null">
+                pic
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="announcement.title != null">
+                #{announcement.title},
+            </if>
+            <if test="announcement.content != null">
+                #{announcement.content},
+            </if>
+            <if test="announcement.upload != null">
+                #{announcement.upload},
+            </if>
+            <if test="announcement.date_pub != null">
+                #{announcement.date_pub},
+            </if>
+            <if test="announcement.pic != null">
+                #{announcement.pic}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="DeleteAnnouncement" parameterType="java.lang.Integer" >
+        DELETE FROM announcements WHERE id = #{id};
+    </delete>
+    
+    <update id="UpdateAnnouncement">
+        UPDATE announcements
+        <set>
+            <if test="announcement.title != null">
+                title = #{announcement.title},
+            </if>
+            <if test="announcement.content != null">
+                content = #{announcement.content},
+            </if>
+            <if test="announcement.upload != null">
+                upload = #{announcement.upload},
+            </if>
+            <if test="announcement.date_pub != null">
+                date_pub = #{announcement.date_pub},
+            </if>
+            <if test="announcement.pic != null">
+                pic = #{announcement.pic}
+            </if>
+        </set>
+        WHERE id = #{announcement.id};
+    </update>
+
+    <select id="GetUserCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        <if test="role == 1">
+            select COUNT(*) from authors;
+        </if>
+        <if test="role == 2">
+            select COUNT(*) from editors WHERE role = 0;
+        </if>
+        <if test="role == 3">
+            select COUNT(*) from editors WHERE role = 1;
+        </if>
+        <if test="role == 4">
+            select COUNT(*) from professors;
+        </if>
+
+    </select>
+
+    <select id="GetUser" parameterType="java.lang.Integer" resultType="HashMap">
+        <if test="role == 1">
+            select `id`, `email`, `name`, `name_pinyin`, `gender`, `address`, `postcode`, `workspace_cn`, `workspace_en`, `major`, `education`,
+            `title`, `officetel`, `phonenum`, `location`, `researchdir`, `academicsec1`, `academicsec2`, `academicsec3`, `introduction`, `alive`
+            from authors WHERE alive = 1 limit #{page},10;
+        </if>
+        <if test="role == 2">
+            select `id`, `username`, `name`, `gender`, `alive` from editors WHERE role = 0 AND alive = 1 limit #{page},10;
+        </if>
+        <if test="role == 3">
+            select `id`, `username`, `name`, `gender`, `alive` from editors WHERE role = 1 AND alive = 1 limit #{page},10;
+        </if>
+        <if test="role == 4">
+            select `id`, `username`, `name`, `gender`, `address`, `card`, `academicsec1`, `academicsec2`, `academicsec3`, `alive` from professors WHERE alive = 1 limit #{page},10;
+        </if>
+    </select>
+
+
+    <update id="ResetPassword">
+        <if test="role == 1">
+            update authors set password = #{pwd} where email = #{username};
+        </if>
+        <if test="role == 2">
+            update editors set password = #{pwd} where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            update editors set password = #{pwd} where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            update professors set password = #{pwd} where username = #{username};
+        </if>
+    </update>
+
+    <update id="DeleteUser">
+        <if test="role == 1">
+            update authors set alive = 0 where email = #{username};
+        </if>
+        <if test="role == 2">
+            update editors set alive = 0 where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            update editors set alive = 0 where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            update professors set alive = 0 where username = #{username};
+        </if>
+    </update>
+
+    <select id="IsUserExist" resultType="java.lang.Integer">
+        <if test="username != null">
+            <if test="role == 2">
+                select id from editors where username = #{username} AND role = 0;
+            </if>
+            <if test="role == 3">
+                select id from editors where username = #{username} AND role = 1;
+            </if>
+            <if test="role == 4">
+                select id from professors where username = #{username};
+            </if>
+        </if>
+    </select>
+
+    <insert id="CreateUser">
+        <if test="role == 2 or role == 3">
+        insert into editors
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="user.username != null">
+                    username,
+                </if>
+                <if test="user.password != null">
+                    password,
+                </if>
+                <if test="user.name != null">
+                    `name`,
+                </if>
+                <if test="user.gender != 0">
+                    gender,
+                </if>
+                <if test="user.safeque1 != null">
+                    safeque1,
+                </if>
+                <if test="user.safeque2 != null">
+                    safeque2,
+                </if>
+                <if test="user.safeque3 != null">
+                    safeque3,
+                </if>
+                <if test="user.role != null">
+                    role,
+                </if>
+                <if test="user.alive != 0">
+                    alive,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="user.username != null">
+                    #{user.username},
+                </if>
+                <if test="user.password != null">
+                    #{user.password},
+                </if>
+                <if test="user.name != null">
+                    #{user.name},
+                </if>
+                <if test="user.gender != 0">
+                    #{user.gender},
+                </if>
+                <if test="user.safeque1 != null">
+                    #{user.safeque1},
+                </if>
+                <if test="user.safeque2 != null">
+                    #{user.safeque2},
+                </if>
+                <if test="user.safeque3 != null">
+                    #{user.safeque3},
+                </if>
+                <if test="user.role != null">
+                    #{user.role},
+                </if>
+                <if test="user.alive != 0">
+                    #{user.alive},
+                </if>
+            </trim>
+        </if>
+        <if test="role == 4">
+            insert into professors
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="user.username != null">
+                    username,
+                </if>
+                <if test="user.password != null">
+                    password,
+                </if>
+                <if test="user.name != null">
+                    `name`,
+                </if>
+                <if test="user.gender != 0">
+                    gender,
+                </if>
+                <if test="user.card != null">
+                    `card`,
+                </if>
+                <if test="user.bank != null">
+                    bank,
+                </if>
+                <if test="user.address != null">
+                    `address`,
+                </if>
+                <if test="user.safeque1 != null">
+                    safeque1,
+                </if>
+                <if test="user.safeque2 != null">
+                    safeque2,
+                </if>
+                <if test="user.safeque3 != null">
+                    safeque3,
+                </if>
+                <if test="user.academicsec1 != 0">
+                    academicsec1,
+                </if>
+                <if test="user.academicsec2 != 0">
+                    academicsec2,
+                </if>
+                <if test="user.academicsec3 != 0">
+                    academicsec3,
+                </if>
+                <if test="user.alive != 0">
+                    alive,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="user.username != null">
+                    #{user.username},
+                </if>
+                <if test="user.password != null">
+                    #{user.password},
+                </if>
+                <if test="user.name != null">
+                    #{user.name},
+                </if>
+                <if test="user.gender != 0">
+                    #{user.gender},
+                </if>
+                <if test="user.card != null">
+                    #{user.card},
+                </if>
+                <if test="user.bank != null">
+                    #{user.bank},
+                </if>
+                <if test="user.address != null">
+                    #{user.address},
+                </if>
+                <if test="user.safeque1 != null">
+                    #{user.safeque1},
+                </if>
+                <if test="user.safeque2 != null">
+                    #{user.safeque2},
+                </if>
+                <if test="user.safeque3 != null">
+                    #{user.safeque3},
+                </if>
+                <if test="user.academicsec1 != 0">
+                    #{user.academicsec1},
+                </if>
+                <if test="user.academicsec2 != 0">
+                    #{user.academicsec2},
+                </if>
+                <if test="user.academicsec3 != 0">
+                    #{user.academicsec3},
+                </if>
+                <if test="user.alive != null">
+                    #{user.alive},
+                </if>
+            </trim>
+        </if>
+    </insert>
+
+    <insert id="CreateAcademicsec" parameterType="java.lang.String" >
+        INSERT INTO type_academicsec(academicsec) VALUE (#{academicsec});
+    </insert>
+
+    <select id="SelectAcademicsec" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT id FROM type_academicsec WHERE academicsec = #{academicsec};
+    </select>
+
+<!--lfx-->
+    <delete id="DeleteAcademicsec" parameterType="java.lang.Integer">
+        DELETE FROM type_academicsec WHERE id = #{id}
+    </delete>
+
+    <select id="GetAcademicsec" resultType="HashMap">
+        SELECT * FROM type_academicsec limit #{startIndex},2;
+    </select>
+    
+    <select id="GetAcademicsecCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM type_academicsec;
+    </select>
+
+<!--lfx-->
+
+    <update id="UpdateAcademicsec">
+        UPDATE type_academicsec set academicsec = #{academicsec} where id = #{id};
+    </update>
+
+    <insert id="CreateColumn" parameterType="java.lang.String" >
+        INSERT INTO type_column(`column`) VALUE (#{column});
+    </insert>
+
+    <select id="SelectColumn" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT id FROM type_column WHERE `column` = #{column};
+    </select>
+
+    <update id="UpdateColumn">
+        UPDATE type_column set `column` = #{column} where id = #{id};
+    </update>
+
+    <select id="GetStandardList" resultType="Hashmap">
+        SELECT 'id', `year`, `standard`, `reviewfee`, `pagecharges`, `articlenum` FROM newsroominfo;
+    </select>
+    
+    <select id="GetStandard" resultType="Hashmap">
+        SELECT 'id',`year`, `standard`, `reviewfee`, `pagecharges`, `articlenum` FROM newsroominfo WHERE  `year` = #{year}
+    </select>
+
+    <update id="UpdateStandard">
+        update newsroominfo set
+        <trim suffixOverrides=",">
+            <if test="standard != 0">
+                `standard` = #{standard},
+            </if>
+            <if test="reviewfee != 0">
+                reviewfee = #{reviewfee},
+            </if>
+            <if test="pagecharges != 0">
+                pagecharges = #{pagecharges},
+            </if>
+            <if test="articlenum != 0">
+                articlenum = #{articlenum},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+        </trim>
+        where `year` = #{year};
+    </update>
+
+    <insert id="InsertStandard">
+        insert into newsroominfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="year != 0">
+                `year`,
+            </if>
+            <if test="standard != 0">
+                standard,
+            </if>
+            <if test="reviewfee != 0">
+                reviewfee,
+            </if>
+            <if test="pagecharges != 0">
+                pagecharges,
+            </if>
+            <if test="articlenum != 0">
+                articlenum,
+            </if>
+            <if test="admin != null">
+                admin,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="year != 0">
+                #{year},
+            </if>
+            <if test="standard != 0">
+                #{standard},
+            </if>
+            <if test="reviewfee != 0">
+                #{reviewfee},
+            </if>
+            <if test="pagecharges != 0">
+                #{pagecharges},
+            </if>
+            <if test="articlenum != 0">
+                #{articlenum},
+            </if>
+            <if test="admin != null">
+                #{admin},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="content != null">
+                #{content},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="GetContent" resultType="Hashmap">
+        SELECT `content` FROM newsroominfo WHERE  `year` = #{year}
+    </select>
+
+    <update id="UpdateContent">
+        update newsroominfo set
+        `content` = #{cont}
+        where `year` = #{year};
+    </update>
+    
+    <select id="GetAnnouncementInfoList" resultType="Hashmap">
+        <if test="type == 1">
+        SELECT pic FROM announcements WHERE pic;
+        </if>
+        <if test="type == 2">
+            SELECT upload FROM announcements WHERE upload;
+        </if>
+    </select>
+
+    <insert id="InsertMain">
+        INSERT into main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="priority != null">
+                priority,
+            </if>
+            <if test="alive != null">
+                alive,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="content != null">
+                #{content},
+            </if>
+            <if test="priority != null">
+                #{priority},
+            </if>
+            <if test="alive != null">
+                #{alive},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="UpdateMain">
+        UPDATE main set
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="priority != null">
+                priority = #{priority},
+            </if>
+            <if test="alive != null">
+                alive = #{alive},
+            </if>
+        </trim>
+        WHERE id = #{id};
+    </update>
+
+    <delete id="DeleteMain">
+        DELETE FROM main WHERE id = #{id};
+    </delete>
+
+    <insert id="CreateInfoCenter">
+        INSERT into infocenter
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="priority != null">
+                priority,
+            </if>
+            <if test="alive != null">
+                alive,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="content != null">
+                #{content},
+            </if>
+            <if test="priority != null">
+                #{priority},
+            </if>
+            <if test="alive != null">
+                #{alive},
+            </if>
+            <if test="date != null">
+                #{date},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="UpdateInfoCenter">
+        UPDATE infocenter set
+        <trim suffixOverrides=",">
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+        </trim>
+        WHERE id = #{type};
+    </update>
+
+    <delete id="DeleteInfoCenter">
+        DELETE FROM infocenter WHERE id = #{id};
+    </delete>
+
+<!--
+lfx
+-->
+
+    <insert id="InsertLink" parameterType="com.example.newsroom.entity.FriendLink">
+        INSERT into friendlink
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="friendLink.linkname != null and friendLink.linkname != ''">
+                `linkname`,
+            </if>
+            <if test="friendLink.linkurl != null and friendLink.linkurl != ''">
+                linkurl,
+            </if>
+            <if test="friendLink.weight != null">
+                weight,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="friendLink.linkname != null and friendLink.linkname != ''">
+                #{friendLink.linkname},
+            </if>
+            <if test="friendLink.linkurl != null and friendLink.linkurl != ''">
+                #{friendLink.linkurl},
+            </if>
+            <if test="friendLink.weight != null">
+                #{friendLink.weight},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="UpdateLink">
+        UPDATE friendlink set
+        <trim suffixOverrides=",">
+            <if test="friendLink.linkname != null and friendLink.linkname != ''">
+                `linkname` = #{friendLink.linkname},
+            </if>
+            <if test="friendLink.linkurl != null and friendLink.linkurl != ''">
+                linkurl = #{friendLink.linkurl},
+            </if>
+            <if test="friendLink.weight != null">
+                weight = #{friendLink.weight},
+            </if>
+        </trim>
+        WHERE id = #{friendLink.id};
+    </update>
+
+    <delete id="DeleteLink">
+        DELETE FROM friendlink WHERE id = #{id};
+    </delete>
+
+    <select id="GetLinkCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM friendlink;
+    </select>
+
+    <select id="SearchLink" resultType="HashMap">
+        SELECT * FROM friendlink limit #{startIndex},2;
+    </select>
+
+    <select id="SearchUserCount" resultType="java.lang.Integer">
+        <if test="usercondition.role == 1">
+            SELECT COUNT(*) FROM authors
+            <where>
+                <if test="usercondition.email != null and usercondition.email != ''">
+                    email = #{usercondition.email}
+                </if>
+                <if test="usercondition.phone != null and usercondition.phone != ''">
+                     AND phonenum = #{usercondition.phone}
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+                <if test="usercondition.username != null">
+                    AND email LIKE "%"#{usercondition.username}"%"
+                </if>
+            </where>
+        </if>
+        <if test="usercondition.role == 2">
+            SELECT COUNT(*) FROM editors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+        </if>
+        <if test="usercondition.role == 3">
+            SELECT COUNT(*) FROM editors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+        </if>
+        <if test="usercondition.role == 4">
+            SELECT count(*) FROM professors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+        </if>
+    </select>
+
+    <select id="SearchUser" resultType="HashMap">
+        <if test="usercondition.role == 1">
+            select `id`, `email`, `name`, `name_pinyin`, `gender`, `address`, `postcode`, `workspace_cn`, `workspace_en`, `major`, `education`,
+            `title`, `officetel`, `phonenum`, `location`, `researchdir`, `academicsec1`, `academicsec2`, `academicsec3`, `introduction`, `alive`
+            from authors
+            <where>
+                <if test="usercondition.email != null and usercondition.email != ''">
+                    AND email = #{usercondition.email}
+                </if>
+                <if test="usercondition.phone != null and usercondition.phone != ''">
+                    AND phonenum = #{usercondition.phone}
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+                <if test="usercondition.username != null">
+                    AND email LIKE "%"#{usercondition.username}"%"
+                </if>
+            </where>
+            limit #{startIndex},2;
+        </if>
+        <if test="usercondition.role == 2">
+            select `id`, `username`, `name`, `gender`, `alive` from editors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+            limit #{startIndex},2;
+        </if>
+        <if test="usercondition.role == 3">
+            select `id`, `username`, `name`, `gender`, `alive` from editors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+            limit #{startIndex},2;
+        </if>
+        <if test="usercondition.role == 4">
+            select `id`, `username`, `name`, `gender`, `address`, `card`, `bank`, `academicsec1`, `academicsec2`, `academicsec3`, `alive` from professors
+            <where>
+                <if test="usercondition.username != null">
+                    username LIKE "%"#{usercondition.username}"%"
+                </if>
+                <if test="usercondition.name != null">
+                    AND name LIKE "%"#{usercondition.name}"%"
+                </if>
+            </where>
+            limit #{startIndex},2;
+        </if>
+    </select>
+    
+    <select id="SearchAnnouncementCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM announcements WHERE title LIKE "%"#{title}"%";
+    </select>
+    
+    <select id="SearchAnnouncement" resultType="HashMap">
+        SELECT * FROM announcements WHERE title LIKE "%"#{title}"%" limit #{startIndex},2;
+    </select>
+
+    <select id="GetAnnouncement" resultType="HashMap">
+        SELECT * FROM announcements WHERE id = #{id};
+    </select>
+
+    <!--  证书  -->
+    <insert id="InsertCertificate" parameterType="com.example.newsroom.entity.Certificate">
+        INSERT into certificate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="certificate.name != null and certificate.name != ''">
+                `name`,
+            </if>
+            <if test="certificate.content != null and certificate.content != ''">
+                content,
+            </if>
+            <if test="certificate.pic != null and certificate.pic != ''">
+                pic,
+            </if>
+            <if test="certificate.date_pub != null">
+                date_pub,
+            </if>
+            <if test="certificate.weight != null">
+                weight,
+            </if>
+            <if test="certificate.alive != null">
+                alive,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="certificate.name != null and certificate.name != ''">
+                #{certificate.name},
+            </if>
+            <if test="certificate.content != null and certificate.content != ''">
+                #{certificate.content},
+            </if>
+            <if test="certificate.pic != null and certificate.pic != ''">
+                #{certificate.pic},
+            </if>
+            <if test="certificate.date_pub != null">
+                #{certificate.date_pub},
+            </if>
+            <if test="certificate.weight != null">
+                #{certificate.weight},
+            </if>
+            <if test="certificate.alive != null">
+                #{certificate.alive},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="UpdateCertificate">
+        UPDATE certificate set
+        <trim suffixOverrides=",">
+            <if test="certificate.name != null and certificate.name != ''">
+                `name` = #{certificate.name},
+            </if>
+            <if test="certificate.content != null and certificate.content != ''">
+                content = #{certificate.content},
+            </if>
+            <if test="certificate.pic != null and certificate.pic != ''">
+                pic = #{certificate.content},
+            </if>
+            <if test="certificate.date_pub != null">
+                date_pub = #{certificate.date_pub},
+            </if>
+            <if test="certificate.weight != null">
+                weight = #{certificate.weight},
+            </if>
+            <if test="certificate.alive != null">
+                alive = #{certificate.weight},
+            </if>
+        </trim>
+        WHERE id = #{certificate.id};
+    </update>
+
+    <delete id="DeleteCertificate">
+        DELETE FROM certificate WHERE id = #{id};
+    </delete>
+
+    <select id="GetCertificateCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM certificate;
+    </select>
+
+    <select id="SearchCertificate" resultType="HashMap">
+        SELECT * FROM certificate limit #{startIndex},2;
+    </select>
+    
+    <update id="UpdateCertificateAlive">
+        UPDATE certificate set alive = #{alive} WHERE id = #{id};
+    </update>
+
+    <!--
+    lfx
+    -->
+
+</mapper>

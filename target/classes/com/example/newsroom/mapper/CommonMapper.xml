@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.newsroom.dao.CommonMapper">
+
+    <!--<cache type="com.example.newsroom.redis.RedisCache" eviction="LRU"-->
+           <!--flushInterval="60000"-->
+           <!--size="1024"-->
+           <!--readOnly="true"/>-->
+
+    <select id="IsEmailExist" parameterType="java.lang.String" resultType="java.lang.Integer">
+        <if test="email != null">
+            select id from authors where email = #{email};
+        </if>
+    </select>
+
+    <insert id="InsertAuthor">
+        insert into authors
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="author.email != null">
+                email,
+            </if>
+            <if test="author.password != null">
+                password,
+            </if>
+            <if test="author.name != null">
+                `name`,
+            </if>
+            <if test="author.name_pinyin != null">
+                name_pinyin,
+            </if>
+            <if test="author.gender != 0">
+                gender,
+            </if>
+            <if test="author.address != null">
+                address,
+            </if>
+            <if test="author.postcode != null">
+                postcode,
+            </if>
+            <if test="author.workspace_cn != null">
+                workspace_cn,
+            </if>
+            <if test="author.workspace_en != null">
+                workspace_en,
+            </if>
+            <if test="author.major != 0">
+                major,
+            </if>
+            <if test="author.education != 0">
+                education,
+            </if>
+            <if test="author.title != null">
+                title,
+            </if>
+            <if test="author.officetel != null">
+                officetel,
+            </if>
+            <if test="author.phonenum != null">
+                phonenum,
+            </if>
+            <if test="author.location != 0">
+                location,
+            </if>
+            <if test="author.researchdir != null">
+                researchdir,
+            </if>
+            <if test="author.academicsec1 != 0">
+                academicsec1,
+            </if>
+            <if test="author.academicsec2 != 0">
+                academicsec2,
+            </if>
+            <if test="author.academicsec3 != 0">
+                academicsec3,
+            </if>
+            <if test="author.introduction != null">
+                introduction,
+            </if>
+            <if test="author.safeque1 != null">
+                safeque1,
+            </if>
+            <if test="author.safeque2 != null">
+                safeque2,
+            </if>
+            <if test="author.safeque3 != null">
+                safeque3,
+            </if>
+            <if test="author.alive != 0">
+                alive,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="author.email != null">
+                #{author.email},
+            </if>
+            <if test="author.password != null">
+                #{author.password},
+            </if>
+            <if test="author.name != null">
+                #{author.name},
+            </if>
+            <if test="author.name_pinyin != null">
+                #{author.name_pinyin},
+            </if>
+            <if test="author.gender != 0">
+                #{author.gender},
+            </if>
+            <if test="author.address != null">
+                #{author.address},
+            </if>
+            <if test="author.postcode != null">
+                #{author.postcode},
+            </if>
+            <if test="author.workspace_cn != null">
+                #{author.workspace_cn},
+            </if>
+            <if test="author.workspace_en != null">
+                #{author.workspace_en},
+            </if>
+            <if test="author.major != 0">
+                #{author.major},
+            </if>
+            <if test="author.education != 0">
+                #{author.education},
+            </if>
+            <if test="author.title != null">
+                #{author.title},
+            </if>
+            <if test="author.officetel != null">
+                #{author.officetel},
+            </if>
+            <if test="author.phonenum != null">
+                #{author.phonenum},
+            </if>
+            <if test="author.location != 0">
+                #{author.location},
+            </if>
+            <if test="author.researchdir != null">
+                #{author.researchdir},
+            </if>
+            <if test="author.academicsec1 != 0">
+                #{author.academicsec1},
+            </if>
+            <if test="author.academicsec2 != 0">
+                #{author.academicsec2},
+            </if>
+            <if test="author.academicsec3 != 0">
+                #{author.academicsec3},
+            </if>
+            <if test="author.introduction != null">
+                #{author.introduction},
+            </if>
+            <if test="author.safeque1 != null">
+                #{author.safeque1},
+            </if>
+            <if test="author.safeque2 != null">
+                #{author.safeque2},
+            </if>
+            <if test="author.safeque3 != null">
+                #{author.safeque3},
+            </if>
+            <if test="author.alive != 0">
+                #{author.alive},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="GetPwdById" resultType="java.lang.String">
+        <if test="role == 1">
+            select password from authors where email = #{username} and alive = 1;
+        </if>
+        <if test="role == 2">
+            select password from editors where username = #{username} and role = 0 and alive = 1;
+        </if>
+        <if test="role == 3">
+            select password from editors where username = #{username} and role = 1 and alive = 1;
+        </if>
+        <if test="role == 4">
+            select password from professors where username = #{username} and alive = 1;
+        </if>
+        <if test="role == 0">
+            select password from newsroominfo where admin = #{username} and `year` = #{year};
+        </if>
+    </select>
+
+    <select id="GetUserById" resultType="HashMap">
+        <if test="role == 1">
+            select * from authors where email = #{username};
+        </if>
+        <if test="role == 2">
+            select * from editors where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            select * from editors where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            select * from professors where username = #{username};
+        </if>
+    </select>
+
+    <select id="GetSafeQueById" resultType="HashMap">
+        <if test="role == 1">
+            select safeque1, safeque2, safeque3 from authors where email = #{username};
+        </if>
+        <if test="role == 2">
+            select safeque1, safeque2, safeque3 from editors where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            select safeque1, safeque2, safeque3 from editors where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            select safeque1, safeque2, safeque3 from professors where username = #{username};
+        </if>
+    </select>
+
+    <select id="GetQueById" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select safeque from bank_safeque where id = #{id};
+    </select>
+
+    <update id="ResetPassword">
+        <if test="resetPwd.role == 1">
+            update authors set password = #{resetPwd.password} where email = #{resetPwd.username};
+        </if>
+        <if test="resetPwd.role == 2">
+            update editors set password = #{resetPwd.password} where username = #{resetPwd.username} and role = 0;
+        </if>
+        <if test="resetPwd.role == 3">
+            update editors set password = #{resetPwd.password} where username = #{resetPwd.username} and role = 1;
+        </if>
+        <if test="resetPwd.role == 4">
+            update professors set password = #{resetPwd.password} where username = #{resetPwd.username};
+        </if>
+    </update>
+
+    <select id="GetAnnouncementList" parameterType="java.lang.Integer" resultType="HashMap">
+        <if test="num == -1">
+            select id,title,date_pub from announcements order by date_pub desc;
+        </if>
+        <if test="num != -1">
+            select id,title,date_pub from announcements order by date_pub desc limit 0,#{num};
+        </if>
+    </select>
+
+    <select id="GetAnnouncement" resultType="HashMap">
+        select * from announcements where id = #{id};
+    </select>
+
+    <select id="GetLatestArticleList" parameterType="java.lang.Integer" resultType="HashMap">
+        <if test="num == -1">
+            select id,title,date_pub from articles
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </where>
+            order by date_pub desc;
+        </if>
+        <if test="num != -1">
+            select id,title,date_pub from articles
+            <where>
+                <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </where>
+            order by date_pub desc limit 0,#{num};
+        </if>
+    </select>
+
+    <select id="GetArticle" resultType="HashMap">
+        select * from articles where id = #{id};
+    </select>
+
+    <select id="GetType" resultType="HashMap">
+        <if test='type == "academicsec"'>
+            select * from type_academicsec order by id;
+        </if>
+        <if test='type == "education"'>
+            select * from type_education order by id;
+        </if>
+        <if test='type == "safeque"'>
+            select * from bank_safeque order by id;
+        </if>
+        <if test='type == "column"'>
+            select * from type_column order by id;
+        </if>
+        <if test='type == "location"'>
+            select * from type_location order by id;
+        </if>
+        <if test='type == "major"'>
+            select * from type_major order by id;
+        </if>
+        <if test='type == "role"'>
+            select * from type_role order by id;
+        </if>
+    </select>
+
+    <select id="GetMainList" resultType="HashMap">
+        SELECT id, `name` FROM main WHERE alive = 1 ORDER BY priority;
+    </select>
+
+    <select id="GetMain" resultType="java.lang.String">
+        SELECT content FROM main WHERE alive = 1 AND id = #{type};
+    </select>
+
+    <select id="GetInfoCenterList" resultType="Hashmap">
+        SELECT id, `name`, content, date_pub FROM infocenter WHERE alive = 1 ORDER BY priority;
+    </select>
+
+    <select id="GetInfoCenter" parameterType="java.lang.Integer" resultType="Hashmap">
+        SELECT content FROM infocenter WHERE id = #{id} AND alive = 1;
+    </select>
+
+    <select id="GetLinkList" resultType="Hashmap">
+        SELECT id, `linkname`, linkurl FROM friendlink ORDER BY weight;
+    </select>
+
+    <select id="GetCertificate" resultType="Hashmap">
+        SELECT id, `name`, content, pic, date_pub FROM certificate WHERE alive = 1 ORDER BY weight;
+    </select>
+
+</mapper>

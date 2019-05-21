@@ -10,8 +10,11 @@ public class All {
     private Task task;
     private int role;
     private int[] id_role;
+    private int stat;
     private int flag;
     private int page;
+    private String begin;
+    private String end;
 
     public void setArticle(Article article) {
         this.article = article;
@@ -85,6 +88,14 @@ public class All {
         return id_role;
     }
 
+    public void setStat(int stat){
+        this.stat = stat;
+    }
+
+    public int getStat(){
+        return stat;
+    }
+
     public void setFlag(int flag) {
         this.flag = flag;
     }
@@ -99,5 +110,21 @@ public class All {
 
     public int getPage() {
         return page;
+    }
+
+    public void setBegin(String begin){
+        this.begin = begin;
+    }
+
+    public String getBegin(){
+        return begin;
+    }
+
+    public void setEnd(String end){
+        this.end = end;
+    }
+
+    public String getEnd(){
+        return end;
     }
 }

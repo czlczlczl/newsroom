@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.newsroom.dao.ManageMapper">
+
+    <!--<cache type="com.example.newsroom.redis.RedisCache" eviction="LRU"-->
+           <!--flushInterval="60000"-->
+           <!--size="1024"-->
+           <!--readOnly="true"/>-->
+
+    <select id="GetPwdById" resultType="java.lang.String">
+        <if test="role == 1">
+            select password from authors where email = #{username} and alive = 1;
+        </if>
+        <if test="role == 2">
+            select password from editors where username = #{username} and role = 0 and alive = 1;
+        </if>
+        <if test="role == 3">
+            select password from editors where username = #{username} and role = 1 and alive = 1;
+        </if>
+        <if test="role == 4">
+            select password from professors where username = #{username} and alive = 1;
+        </if>
+    </select>
+
+    <update id="ResetPassword">
+        <if test="role == 1">
+            update authors set password = #{resetPwd} where email = #{username};
+        </if>
+        <if test="role == 2">
+            update editors set password = #{resetPwd} where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            update editors set password = #{resetPwd} where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            update professors set password = #{resetPwd} where username = #{username};
+        </if>
+    </update>
+
+    <select id="GetInformation" resultType="HashMap">
+        <if test="role == 1">
+            select id, email, name, name_pinyin, gender, address, postcode,
+            workspace_cn, workspace_en, major, education, title, officetel,
+            phonenum, location, researchdir, academicsec1, academicsec2, academicsec3, introduction
+            from  authors
+            where email = #{username};
+        </if>
+        <if test="role == 2">
+            select id, `name`, gender, username from editors where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            select id, `name`, gender, username from editors where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            select id, name, gender, academicsec1, academicsec2, academicsec3, username, address, bank, card from professors
+            where username = #{username};
+        </if>
+    </select>
+
+    <update id="UpdateUserInfo">
+        <if test="role == 1">
+            update authors set
+            <trim suffixOverrides=",">
+                <if test="userinfo.name != null">
+                    `name` = #{userinfo.name},
+                </if>
+                <if test="userinfo.name_pinyin != null">
+                    name_pinyin= #{userinfo.name_pinyin},
+                </if>
+                <if test="userinfo.gender != 0">
+                    gender= #{userinfo.gender},
+                </if>
+                <if test="userinfo.address != null">
+                    address= #{userinfo.address},
+                </if>
+                <if test="userinfo.postcode != null">
+                    postcode= #{userinfo.postcode},
+                </if>
+                <if test="userinfo.workspace_cn != null">
+                    workspace_cn= #{userinfo.workspace_cn},
+                </if>
+                <if test="userinfo.workspace_en != null">
+                    workspace_en= #{userinfo.workspace_en},
+                </if>
+                <if test="userinfo.major != 0">
+                    major= #{userinfo.major},
+                </if>
+                <if test="userinfo.education != 0">
+                    education= #{userinfo.education},
+                </if>
+                <if test="userinfo.title != null">
+                    title= #{userinfo.title},
+                </if>
+                <if test="userinfo.officetel != null">
+                    officetel= #{userinfo.officetel},
+                </if>
+                <if test="userinfo.phonenum != null">
+                    phonenum= #{userinfo.phonenum},
+                </if>
+                <if test="userinfo.location != 0">
+                    location= #{userinfo.location},
+                </if>
+                <if test="userinfo.researchdir != null">
+                    researchdir= #{userinfo.researchdir},
+                </if>
+                <if test="userinfo.academicsec1 != 0">
+                    academicsec1= #{userinfo.academicsec1},
+                </if>
+                <if test="userinfo.academicsec2 != 0">
+                    academicsec2= #{userinfo.academicsec2},
+                </if>
+                <if test="userinfo.academicsec3 != 0">
+                    academicsec3= #{userinfo.academicsec3},
+                </if>
+                <if test="userinfo.introduction != null">
+                    introduction= #{userinfo.introduction}
+                </if>
+            </trim>
+            where email = #{username};
+        </if>
+        <if test="role == 2">
+            update editors set
+            <trim suffixOverrides=",">
+                <if test="userinfo.name != null">
+                    `name` = #{userinfo.name},
+                </if>
+                <if test="userinfo.gender != 0">
+                    gender= #{userinfo.gender}
+                </if>
+            </trim>
+            where username = #{username} and role = 0;
+        </if>
+        <if test="role == 3">
+            update editors set
+            <trim suffixOverrides=",">
+                <if test="userinfo.name != null">
+                    `name` = #{userinfo.name},
+                </if>
+                <if test="userinfo.gender != 0">
+                    gender= #{userinfo.gender}
+                </if>
+            </trim>
+            where username = #{username} and role = 1;
+        </if>
+        <if test="role == 4">
+            update professors set
+            <trim suffixOverrides=",">
+                <if test="userinfo.name != null">
+                    `name` = #{userinfo.name},
+                </if>
+                <if test="userinfo.gender != 0">
+                    gender= #{userinfo.gender},
+                </if>
+                <if test="userinfo.address != null">
+                    address= #{userinfo.address},
+                </if>
+                <if test="userinfo.bank != null">
+                    bank= #{userinfo.bank},
+                </if>
+                <if test="userinfo.card != null">
+                    card= #{userinfo.card},
+                </if>
+                <if test="userinfo.academicsec1 != 0">
+                    academicsec1= #{userinfo.academicsec1},
+                </if>
+                <if test="userinfo.academicsec2 != 0">
+                    academicsec2= #{userinfo.academicsec2},
+                </if>
+                <if test="userinfo.academicsec3 != 0">
+                    academicsec3= #{userinfo.academicsec3},
+                </if>
+            </trim>
+            where username = #{username};
+        </if>
+    </update>
+
+    <select id="GetName" resultType="java.lang.String">
+        <if test="role == 1">
+            select name from authors where email = #{username} and alive = 1;
+        </if>
+        <if test="role == 2">
+            select name from editors where username = #{username} and role = 0 and alive = 1;
+        </if>
+        <if test="role == 3">
+            select name from editors where username = #{username} and role = 1 and alive = 1;
+        </if>
+        <if test="role == 4">
+            select name from professors where username = #{username} and alive = 1;
+        </if>
+    </select>
+
+</mapper>
