@@ -68,16 +68,16 @@
 
     <select id="GetUserCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         <if test="role == 1">
-            select COUNT(*) from authors;
+            select COUNT(*) from authors where alive = 1;
         </if>
         <if test="role == 2">
-            select COUNT(*) from editors WHERE role = 0;
+            select COUNT(*) from editors WHERE role = 0 and alive = 1;
         </if>
         <if test="role == 3">
-            select COUNT(*) from editors WHERE role = 1;
+            select COUNT(*) from editors WHERE role = 1 and alive = 1;
         </if>
         <if test="role == 4">
-            select COUNT(*) from professors;
+            select COUNT(*) from professors where alive = 1;
         </if>
 
     </select>
@@ -99,6 +99,73 @@
         </if>
     </select>
 
+    <select id="GetUserById" resultType="HashMap">
+        <if test="role == 1">
+            select `id`, `email`, `name`, `name_pinyin`, `gender`, `address`, `postcode`, `workspace_cn`, `workspace_en`, `major`, `education`,
+            `title`, `officetel`, `phonenum`, `location`, `researchdir`, `academicsec1`, `academicsec2`, `academicsec3`, `introduction`, `alive`
+            from authors WHERE id=#{id};
+        </if>
+        <if test="role == 2">
+            select `id`, `username`, `name`, `gender`, `alive` from editors WHERE id=#{id};
+        </if>
+        <if test="role == 3">
+            select `id`, `username`, `name`, `gender`, `alive` from editors WHERE id=#{id};
+        </if>
+        <if test="role == 4">
+            select `id`, `username`, `name`, `gender`, `address`,bank, `card`, `academicsec1`, `academicsec2`, `academicsec3`, `alive` from professors WHERE id=#{id};
+        </if>
+    </select>
+
+    <update id="UpdateUser">
+        <if test="role == 2 or role == 3">
+            update editors
+              <set>
+                <if test="user.username != null">
+                    username = #{user.username},
+                </if>
+                <if test="user.name != null">
+                    `name` = #{user.name},
+                </if>
+                <if test="user.gender != 0">
+                    gender = #{user.gender},
+                </if>
+              </set>
+            WHERE id = #{user.id};
+        </if>
+        <if test="role == 4">
+            UPDATE professors
+              <set>
+                <if test="user.username != null">
+                    username = #{user.username},
+                </if>
+                <if test="user.name != null">
+                    `name` = #{user.name},
+                </if>
+                <if test="user.gender != 0">
+                    gender = #{user.gender},
+                </if>
+                <if test="user.card != null">
+                    `card` = #{user.card},
+                </if>
+                <if test="user.bank != null">
+                    bank = #{user.bank},
+                </if>
+                <if test="user.address != null">
+                    `address` = #{user.address},
+                </if>
+                <if test="user.academicsec1 != 0">
+                    academicsec1 = #{user.academicsec1},
+                </if>
+                <if test="user.academicsec2 != 0">
+                    academicsec2 = #{user.academicsec2},
+                </if>
+                <if test="user.academicsec3 != 0">
+                    academicsec3 = #{user.academicsec3},
+                </if>
+              </set>
+            WHERE id = #{user.id};
+        </if>
+    </update>
 
     <update id="ResetPassword">
         <if test="role == 1">
@@ -307,20 +374,21 @@
         SELECT id FROM type_academicsec WHERE academicsec = #{academicsec};
     </select>
 
-<!--lfx-->
+    <select id="GetAcademicsecById" resultType="HashMap">
+        SELECT * FROM type_academicsec WHERE id=#{id};
+    </select>
+
     <delete id="DeleteAcademicsec" parameterType="java.lang.Integer">
         DELETE FROM type_academicsec WHERE id = #{id}
     </delete>
 
-    <select id="GetAcademicsec" resultType="HashMap">
-        SELECT * FROM type_academicsec limit #{startIndex},2;
-    </select>
-    
     <select id="GetAcademicsecCount" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM type_academicsec;
     </select>
 
-<!--lfx-->
+    <select id="GetAcademicsec" resultType="HashMap">
+        SELECT * FROM type_academicsec limit #{startIndex},10;
+    </select>
 
     <update id="UpdateAcademicsec">
         UPDATE type_academicsec set academicsec = #{academicsec} where id = #{id};
@@ -337,6 +405,22 @@
     <update id="UpdateColumn">
         UPDATE type_column set `column` = #{column} where id = #{id};
     </update>
+    
+    <delete id="DeleteColumn">
+        DELETE FROM type_column WHERE id = #{id};
+    </delete>
+
+    <select id="GetColumnCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM type_column;
+    </select>
+    
+    <select id="GetColumn" resultType="HashMap">
+        SELECT * FROM type_column limit #{startIndex},10;
+    </select>
+    
+    <select id="GetColumnById" resultType="HashMap">
+        SELECT * FROM type_column WHERE id = #{id};
+    </select>
 
     <select id="GetStandardList" resultType="Hashmap">
         SELECT 'id', `year`, `standard`, `reviewfee`, `pagecharges`, `articlenum` FROM newsroominfo;
@@ -441,6 +525,9 @@
         <if test="type == 2">
             SELECT upload FROM announcements WHERE upload;
         </if>
+        <if test="type == 3">
+            SELECT pic FROM certificate WHERE pic;
+        </if>
     </select>
 
     <insert id="InsertMain">
@@ -452,10 +539,10 @@
             <if test="content != null">
                 content,
             </if>
-            <if test="priority != null">
+            <if test="priority >= 0">
                 priority,
             </if>
-            <if test="alive != null">
+            <if test="alive != 0">
                 alive,
             </if>
         </trim>
@@ -466,37 +553,49 @@
             <if test="content != null">
                 #{content},
             </if>
-            <if test="priority != null">
+            <if test="priority >= 0">
                 #{priority},
             </if>
-            <if test="alive != null">
+            <if test="alive != 0">
                 #{alive},
             </if>
         </trim>
     </insert>
 
     <update id="UpdateMain">
-        UPDATE main set
-        <trim suffixOverrides=",">
+        UPDATE main
+          <set>
             <if test="name != null">
                 `name` = #{name},
             </if>
             <if test="content != null">
                 content = #{content},
             </if>
-            <if test="priority != null">
+            <if test="priority >= 0">
                 priority = #{priority},
             </if>
-            <if test="alive != null">
+            <if test="alive != 0">
                 alive = #{alive},
             </if>
-        </trim>
+          </set>
         WHERE id = #{id};
     </update>
 
-    <delete id="DeleteMain">
-        DELETE FROM main WHERE id = #{id};
-    </delete>
+    <update id="DeleteMain">
+        update main set alive = 0 where id = #{id};
+    </update>
+    
+    <select id="GetMainById" resultType="HashMap">
+        SELECT * FROM main WHERE id = #{id};
+    </select>
+    
+    <select id="GetMainCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM main where alive = 1;
+    </select>
+    
+    <select id="GetMain" resultType="HashMap">
+        SELECT * FROM main where alive = 1 limit #{startIndex},10;
+    </select>
 
     <insert id="CreateInfoCenter">
         INSERT into infocenter
@@ -507,14 +606,14 @@
             <if test="content != null">
                 content,
             </if>
-            <if test="priority != null">
+            <if test="priority >= 0">
                 priority,
             </if>
-            <if test="alive != null">
+            <if test="alive != 0">
                 alive,
             </if>
             <if test="date != null">
-                date,
+                date_pub,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -524,10 +623,10 @@
             <if test="content != null">
                 #{content},
             </if>
-            <if test="priority != null">
+            <if test="priority >= 0">
                 #{priority},
             </if>
-            <if test="alive != null">
+            <if test="alive != 0">
                 #{alive},
             </if>
             <if test="date != null">
@@ -542,20 +641,40 @@
             <if test="name != null">
                 `name` = #{name},
             </if>
-            <if test="content != null">
-                content = #{content},
+            <if test="content != null and content != ''">
+            content = #{content},
+            </if>
+            <if test="priority >= 0">
+                priority = #{priority},
+            </if>
+            <if test="alive != 0">
+                alive = #{alive},
+            </if>
+            <if test="date != null">
+                date_pub = #{date}
             </if>
         </trim>
         WHERE id = #{type};
     </update>
+    
+    <select id="GetInfoCenterById" resultType="HashMap">
+        SELECT * FROM infocenter WHERE id = #{id};
+    </select>
+    
+    <select id="GetInfoCenterCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM infocenter where alive = 1;
+    </select>
+    
+    <select id="GetInfoCenter" resultType="HashMap">
+        SELECT * FROM infocenter where alive = 1 limit #{startIndex},10;
+    </select>
 
-    <delete id="DeleteInfoCenter">
+<!--    <delete id="DeleteInfoCenter">
         DELETE FROM infocenter WHERE id = #{id};
-    </delete>
-
-<!--
-lfx
--->
+    </delete>-->
+    <update id="DeleteInfoCenter">
+        update infocenter set alive = 0;
+    </update>
 
     <insert id="InsertLink" parameterType="com.example.newsroom.entity.FriendLink">
         INSERT into friendlink
@@ -577,7 +696,7 @@ lfx
             <if test="friendLink.linkurl != null and friendLink.linkurl != ''">
                 #{friendLink.linkurl},
             </if>
-            <if test="friendLink.weight != null">
+            <if test="friendLink.weight >= 0">
                 #{friendLink.weight},
             </if>
         </trim>
@@ -592,7 +711,7 @@ lfx
             <if test="friendLink.linkurl != null and friendLink.linkurl != ''">
                 linkurl = #{friendLink.linkurl},
             </if>
-            <if test="friendLink.weight != null">
+            <if test="friendLink.weight >= 0">
                 weight = #{friendLink.weight},
             </if>
         </trim>
@@ -608,15 +727,20 @@ lfx
     </select>
 
     <select id="SearchLink" resultType="HashMap">
-        SELECT * FROM friendlink limit #{startIndex},2;
+        SELECT * FROM friendlink limit #{startIndex},10;
+    </select>
+    
+    <select id="GetLinkById" resultType="HashMap">
+        SELECT * FROM friendlink WHERE id = #{id};
     </select>
 
     <select id="SearchUserCount" resultType="java.lang.Integer">
         <if test="usercondition.role == 1">
             SELECT COUNT(*) FROM authors
             <where>
+                    alive = 1
                 <if test="usercondition.email != null and usercondition.email != ''">
-                    email = #{usercondition.email}
+                    and email like "%"#{usercondition.email}"%"
                 </if>
                 <if test="usercondition.phone != null and usercondition.phone != ''">
                      AND phonenum = #{usercondition.phone}
@@ -632,8 +756,9 @@ lfx
         <if test="usercondition.role == 2">
             SELECT COUNT(*) FROM editors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
@@ -643,8 +768,9 @@ lfx
         <if test="usercondition.role == 3">
             SELECT COUNT(*) FROM editors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
@@ -654,8 +780,9 @@ lfx
         <if test="usercondition.role == 4">
             SELECT count(*) FROM professors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
@@ -670,8 +797,9 @@ lfx
             `title`, `officetel`, `phonenum`, `location`, `researchdir`, `academicsec1`, `academicsec2`, `academicsec3`, `introduction`, `alive`
             from authors
             <where>
+                    alive = 1
                 <if test="usercondition.email != null and usercondition.email != ''">
-                    AND email = #{usercondition.email}
+                    and email like "%"#{usercondition.email}"%"
                 </if>
                 <if test="usercondition.phone != null and usercondition.phone != ''">
                     AND phonenum = #{usercondition.phone}
@@ -683,52 +811,65 @@ lfx
                     AND email LIKE "%"#{usercondition.username}"%"
                 </if>
             </where>
-            limit #{startIndex},2;
+            limit #{startIndex},10;
         </if>
         <if test="usercondition.role == 2">
             select `id`, `username`, `name`, `gender`, `alive` from editors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
                 </if>
             </where>
-            limit #{startIndex},2;
+            limit #{startIndex},10;
         </if>
         <if test="usercondition.role == 3">
             select `id`, `username`, `name`, `gender`, `alive` from editors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
                 </if>
             </where>
-            limit #{startIndex},2;
+            limit #{startIndex},10;
         </if>
         <if test="usercondition.role == 4">
             select `id`, `username`, `name`, `gender`, `address`, `card`, `bank`, `academicsec1`, `academicsec2`, `academicsec3`, `alive` from professors
             <where>
+                    alive = 1
                 <if test="usercondition.username != null">
-                    username LIKE "%"#{usercondition.username}"%"
+                    and username LIKE "%"#{usercondition.username}"%"
                 </if>
                 <if test="usercondition.name != null">
                     AND name LIKE "%"#{usercondition.name}"%"
                 </if>
             </where>
-            limit #{startIndex},2;
+            limit #{startIndex},10;
         </if>
     </select>
     
     <select id="SearchAnnouncementCount" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM announcements WHERE title LIKE "%"#{title}"%";
+        <if test="title == null">
+            SELECT COUNT(*) FROM announcements;
+        </if>
+        <if test="title != null">
+            SELECT COUNT(*) FROM announcements WHERE title LIKE "%"#{title}"%";
+        </if>
     </select>
     
     <select id="SearchAnnouncement" resultType="HashMap">
-        SELECT * FROM announcements WHERE title LIKE "%"#{title}"%" limit #{startIndex},2;
+        <if test="title == null">
+            SELECT * FROM announcements limit #{startIndex},10;
+        </if>
+        <if test="title != null">
+            SELECT * FROM announcements WHERE title LIKE "%"#{title}"%" limit #{startIndex},10;
+        </if>
     </select>
 
     <select id="GetAnnouncement" resultType="HashMap">
@@ -751,10 +892,10 @@ lfx
             <if test="certificate.date_pub != null">
                 date_pub,
             </if>
-            <if test="certificate.weight != null">
+            <if test="certificate.weight >= 0">
                 weight,
             </if>
-            <if test="certificate.alive != null">
+            <if test="certificate.alive != 0">
                 alive,
             </if>
         </trim>
@@ -771,10 +912,10 @@ lfx
             <if test="certificate.date_pub != null">
                 #{certificate.date_pub},
             </if>
-            <if test="certificate.weight != null">
+            <if test="certificate.weight >= 0">
                 #{certificate.weight},
             </if>
-            <if test="certificate.alive != null">
+            <if test="certificate.alive != 0">
                 #{certificate.alive},
             </if>
         </trim>
@@ -795,11 +936,8 @@ lfx
             <if test="certificate.date_pub != null">
                 date_pub = #{certificate.date_pub},
             </if>
-            <if test="certificate.weight != null">
+            <if test="certificate.weight >= 0">
                 weight = #{certificate.weight},
-            </if>
-            <if test="certificate.alive != null">
-                alive = #{certificate.weight},
             </if>
         </trim>
         WHERE id = #{certificate.id};
@@ -810,19 +948,19 @@ lfx
     </delete>
 
     <select id="GetCertificateCount" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM certificate;
+        SELECT COUNT(*) FROM certificate where alive = 1;
     </select>
 
     <select id="SearchCertificate" resultType="HashMap">
-        SELECT * FROM certificate limit #{startIndex},2;
+        SELECT * FROM certificate where alive = 1 limit #{startIndex},10;
+    </select>
+
+    <select id="GetCertificateById" resultType="HashMap">
+        SELECT * FROM certificate WHERE id = #{id};
     </select>
     
     <update id="UpdateCertificateAlive">
         UPDATE certificate set alive = #{alive} WHERE id = #{id};
     </update>
-
-    <!--
-    lfx
-    -->
 
 </mapper>

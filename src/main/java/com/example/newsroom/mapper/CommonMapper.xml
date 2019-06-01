@@ -299,7 +299,11 @@
     </select>
 
     <select id="GetInfoCenterList" resultType="Hashmap">
-        SELECT id, `name`, content, date_pub, weight FROM infocenter WHERE alive = 1 ORDER BY priority;
+        SELECT id, `name`, content, date_pub, priority FROM infocenter WHERE alive = 1 ORDER BY priority;
+    </select>
+
+    <select id="GetInfoCenter" resultType="Hashmap">
+        SELECT content FROM infocenter WHERE alive = 1 AND id = #{id};
     </select>
 
     <select id="GetLinkList" resultType="Hashmap">

@@ -4,6 +4,7 @@ import com.example.newsroom.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -24,6 +25,10 @@ public interface AdminMapper {
 
     List<HashMap<String,Object>> GetUser(@Param(value = "role")int role, @Param(value = "page")int page);
 
+    List<HashMap<String,Object>> GetUserById(@Param(value = "id")int id, @Param(value = "role")int role);
+
+    Integer UpdateUser(@Param(value = "user")Object user, @Param(value = "role")int role );
+
     Integer ResetPassword(@Param(value = "username")String username, @Param(value = "pwd")String pwd, @Param(value = "role")int role );
 
     Integer DeleteUser(@Param(value = "username")String username, @Param(value = "role")int role );
@@ -38,11 +43,21 @@ public interface AdminMapper {
 
     Integer UpdateAcademicsec(@Param(value = "academicsec")String academicsec, @Param(value = "id")int id);
 
+    List<HashMap<String,Object>> GetAcademicsecById(@Param(value = "id")int id);
+
     Integer CreateColumn(@Param(value = "column")String column);
 
     Integer SelectColumn(@Param(value = "column")String column);
 
     Integer UpdateColumn(@Param(value = "column")String column, @Param(value = "id")int id);
+
+    Integer DeleteColumn(@Param(value = "id") int id);
+
+    Integer GetColumnCount();
+
+    List<HashMap<String, Object>> GetColumn(@Param(value = "startIndex") int startIndex);
+
+    List<HashMap<String, Object>> GetColumnById(@Param(value = "id") int id);
 
     List<HashMap<String,Object>> GetStandardList();
 
@@ -69,17 +84,25 @@ public interface AdminMapper {
 
     Integer DeleteMain(@Param(value = "id")int id);
 
+    List<HashMap<String, Object>> GetMainById(@Param(value = "id") int id);
+
+    Integer GetMainCount();
+
+    List<HashMap<String, Object>> GetMain(@Param(value = "startIndex") int startIndex);
+
     Integer CreateInfoCenter(@Param(value = "name")String name, @Param(value = "content")String content, @Param(value = "priority")int priority, @Param(value = "alive")int alive, @Param(value = "date")Date date);
 
-    Integer UpdateInfoCenter(@Param(value = "type")int type, @Param(value = "name")String name, @Param(value = "content")String content, @Param(value = "priority")int priority, @Param(value = "alive")int alive);
+    Integer UpdateInfoCenter(@Param(value = "type")int type, @Param(value = "name")String name, @Param(value = "content")String content, @Param(value = "priority")int priority, @Param(value = "alive")int alive, @Param(value = "date")Date date);
+
+    List<HashMap<String,Object>> GetInfoCenterById(@Param(value = "id")int id);
+
+    Integer GetInfoCenterCount();
+
+    List<HashMap<String, Object>> GetInfoCenter(@Param(value = "startIndex") int startIndex);
 
     Integer DeleteInfoCenter(@Param(value = "id")int id);
 
     Integer UpdateMainList(@Param(value = "type")int type, @Param(value = "name")String name);
-
-    /**
-     *TODO lfx
-     */
 
     Integer InsertLink(@Param(value = "friendLink")FriendLink link);
 
@@ -91,11 +114,13 @@ public interface AdminMapper {
 
     List<HashMap<String,Object>> SearchLink(@Param(value = "startIndex") int startIndex);
 
+    List<HashMap<String, Object>> GetLinkById(@Param(value = "id") int id);
+
     List<HashMap<String,Object>> SearchUser(@Param(value = "usercondition") UserCondition condition, @Param(value = "startIndex") int startIndex);
 
     Integer SearchUserCount(@Param(value = "usercondition") UserCondition condition);
 
-    Integer SearchAnnouncementCount(@Param(value = "title") String title);
+    Integer SearchAnnouncementCount(@Param(value = "title") String title, @Param(value = "page") int page);
 
     List<HashMap<String, Object>> SearchAnnouncement(@Param(value = "title") String title, @Param(value = "startIndex") int startIndex);
 
@@ -118,18 +143,8 @@ public interface AdminMapper {
 
     List<HashMap<String,Object>> SearchCertificate(@Param(value = "startIndex") int startIndex);
 
+    List<HashMap<String, Object>> GetCertificateById(@Param(value = "id") int id);
+
     Integer UpdateCertificateAlive(@Param(value = "id")int id, @Param(value = "alive")int alive);
-
-
-    /**
-     * lfx
-     */
-
-
-/*    Integer InsertLink(@Param(value = "name")String name, @Param(value = "content")String content);
-
-    Integer UpdateLink(@Param(value = "type")int type, @Param(value = "name")String name, @Param(value = "content")String content);
-
-    Integer DeleteLink(@Param(value = "id")int id);*/
 
 }

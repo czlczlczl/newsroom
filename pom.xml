@@ -5,7 +5,7 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>newsroom</artifactId>
-	<version>0.0.4</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>newsroom</name>
@@ -115,6 +115,27 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.5-FINAL</version>
 		</dependency>
+<!--//cache-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+<!--//优化第一次加载速度-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+<!--&lt;!&ndash;//ehcache&ndash;&gt;-->
+		<!--<dependency>-->
+			<!--<groupId>net.sf.ehcache</groupId>-->
+			<!--<artifactId>ehcache</artifactId>-->
+		<!--</dependency>-->
+<!--&lt;!&ndash;redis&ndash;&gt;-->
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-data-redis</artifactId>-->
+		<!--</dependency>-->
+
 
 		<!--<dependency>-->
 			<!--&lt;!&ndash; 由于我使用的spring boot所以我是引入spring-boot-starter-security而且我使用了spring io所以不需要填写依赖的版本号 &ndash;&gt;-->

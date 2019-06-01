@@ -1,24 +1,18 @@
 package com.example.newsroom.controller;
 
 import com.example.newsroom.dao.CommonMapper;
-import com.example.newsroom.service.CommonService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import sun.font.Script;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.Action;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/file")
-
 public class FileController {
     public static final String artpath = "./file/upload";//文章
     public static final String anattapath = "./file/AnnouncementAnnexes";//公告附件

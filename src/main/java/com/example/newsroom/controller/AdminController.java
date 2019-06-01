@@ -1,13 +1,11 @@
 package com.example.newsroom.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.newsroom.entity.Announcement;
-import com.example.newsroom.entity.Certificate;
-import com.example.newsroom.entity.FriendLink;
-import com.example.newsroom.entity.UserCondition;
+import com.example.newsroom.entity.*;
 import com.example.newsroom.service.AdminService;
 import com.example.newsroom.util.RandomUtil;
 import com.example.newsroom.util.Sha256;
+import com.example.newsroom.util.WebSecurityConfig;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -117,7 +115,6 @@ public class AdminController {
         return map.put("result",0);
     }
 
-
     /**
      * 3. 删除公告
      * @param id
@@ -134,11 +131,99 @@ public class AdminController {
     }
 
     /**
+     * 更新公告
+     * @param id
+     * @param file
+     * @param title
+     * @param content
+     * @param pic
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/updateannouncement")
+    public Object UpdateAnnouncement(@RequestParam(value = "id")int id, @RequestParam(value = "title") String title,
+                                     @RequestParam(value = "content") String content,@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "pic", required = false) String pic,
+                                     HttpSession httpSession) {
+
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        //判断公告附件和公告图片是否修改
+        Announcement announcement = new Announcement();
+        announcement.setId(id);
+        if(file != null) {
+            String s = file.getOriginalFilename();
+            String a[] = s.split("\\.");
+            File file1 = new File(anpath,RandomUtil.getRandomFileName() + "." + a[a.length - 1]);
+            if (!file1.exists()) {
+                try {
+                    file1.createNewFile();
+                    FileOutputStream fileOutputStream = new FileOutputStream(file1);
+                    fileOutputStream.write(file.getBytes());
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            announcement.setTitle(title);
+            announcement.setContent(content);
+            announcement.setDate_pub(new Date());
+            announcement.setUpload(file1.getName());
+        }else {
+            announcement.setTitle(title);
+            announcement.setContent(content);
+            announcement.setDate_pub(new Date());
+        }
+        if (pic != null) {
+            announcement.setPic(pic);
+        }
+
+        return adminService.UpdateAnnouncement(announcement);
+    }
+
+    /**
+     * 通过id得到具体公告
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getannouncement/id={id}")
+    public Object GetAnnouncement(@PathVariable(value = "id")int id) {
+
+        return adminService.GetAnnouncement(id);
+    }
+
+    /**
+     * 通过公告标题来查询公告
+     * @param title
+     * @param page
+     * @param httpSession
+     * @return
+     */
+    /**
+     * 通过公告标题来查询公告
+     * @param adminEntity，取出title和page
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/getannouncement")
+    public Object GetAnnouncement(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetAnnouncement(adminEntity.getTitle(), adminEntity.getPage());
+    }
+
+    /**
      * 4. 得到四种用户信息
      * @param role
      * @param httpSession
      * @return
      */
+    @Deprecated
     @GetMapping(value = "/getuser/role={role}&page={page}")
     public Object GetUser(@PathVariable(value = "role")int role, @PathVariable(value = "page")int page, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
@@ -166,6 +251,24 @@ public class AdminController {
     }
 
     /**
+     * 创建编辑或审稿人
+     * @param user
+     * @param role
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/createuser/role={role}")
+    public Object CreateUser(@RequestBody JSONObject user, @PathVariable(value = "role")int role, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        user.put("password", Sha256.getSHA256StrJava((String) user.get("username")+(String) user.get("password")));
+        return adminService.CreateUser(user,role);
+    }
+
+    /**
      * 6. 删除账号
      * @param username
      * @param role
@@ -182,69 +285,172 @@ public class AdminController {
     }
 
     /**
-     * 7. 创建编辑或审稿人
-     *
-     * @param user
+     * 通过id查询具体的编辑或审稿人
+     * @param id
+     * @param role
+     * @param httpSession
      * @return
      */
-    @PostMapping(value = "/createuser/role={role}")
-    public Object CreateUser(@RequestBody JSONObject user, @PathVariable(value = "role")int role, HttpSession httpSession){
+    @GetMapping(value = "/getuser/role={role}/id={id}")
+    public Object GetUserById(@PathVariable(value = "id")int id, @PathVariable(value = "role")int role, HttpSession httpSession) {
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        user.put("password", Sha256.getSHA256StrJava((String) user.get("username")+(String) user.get("password")));
-        return adminService.CreateUser(user,role);
+        return adminService.GetUserById(id,role);
+
     }
 
     /**
-     * 8. 创建学术领域
-     * @param academicsec
+     * 修改编辑或审稿人
+     * @param user
+     * @param role
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/updateuser/role={role}")
+    public Object UpdateUser(@RequestBody JSONObject user, @PathVariable(value = "role")int role, HttpSession httpSession) {
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.UpdateUser(user,role);
+    }
+
+    /**
+     *得到要查询的用户
+     * @param userCondition 查询条件
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/searchuser")
+    public Object SearchUser(@RequestBody UserCondition userCondition, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.SearchUser(userCondition);
+    }
+
+    /**
+     * 创建学术领域
+     * @param adminEntity，主要取出里面的学术领域名称
      * @param httpSession
      * @return
      */
     @PostMapping(value = "/createacademicsec")
-    public Object CreateAcademicsec(@RequestParam(value = "academicsec")String academicsec, HttpSession httpSession){
+    public Object CreateAcademicsec(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.CreateAcademicsec(academicsec);
+        return adminService.CreateAcademicsec(adminEntity.getAcademicsec());
     }
 
     /**
-     * 9. 更新学术领域
-     * @param academicsec
-     * @param id
+     * 根据id来删除学术领域
+     * @param adminEntity,主要取出里面的id来删除学术领域
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/deleteacademicsec")
+    public Object DeleteAcademicsec(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.DeleteAcademicsec(adminEntity.getId());
+    }
+
+    /**
+     * 更新学术领域
+     * @param adminEntity，主要取出来学术领域名称和id
      * @param httpSession
      * @return
      */
     @PostMapping(value = "/updateacademicsec")
-    public Object UpdateAcademicsec(@RequestParam(value = "academicsec")String academicsec, @RequestParam(value = "id")int id, HttpSession httpSession){
+    public Object UpdateAcademicsec(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.UpdateAcademicsec(academicsec,id);
+        return adminService.UpdateAcademicsec(adminEntity.getAcademicsec(),adminEntity.getId());
     }
 
     /**
-     * 10. 创建栏目
-     * @param column
+     * 得到学术领域的列表
+     * @param page 当前页
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getacademicsec")
+    public Object GetAcademicsec(@RequestParam(value = "page",defaultValue = "1") int page, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetAcademicsec(page);
+    }
+
+    /**
+     * 通过id得到具体的学术领域
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getacademicsec/id={id}")
+    public Object GetAcademicsecById(@PathVariable(value = "id") int id, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetAcademicsecById(id);
+    }
+
+    /**
+     * 创建栏目
+     * @param adminEntity，主要栏目名称
      * @param httpSession
      * @return
      */
     @PostMapping(value = "/createcolumn")
-    public Object CreateColumn(@RequestParam(value = "column")String column, HttpSession httpSession){
+    public Object CreateColumn(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.CreateColumn(column);
+        return adminService.CreateColumn(adminEntity.getColumn());
+    }
+
+    /**
+     *通过id删除栏目
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    /**
+     * s通过id删除栏目
+     * @param adminEntity,主要取出栏目id
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/deletecolumn")
+    public Object DeleteColumn(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.DeleteColumn(adminEntity.getId());
     }
 
     /**
@@ -254,14 +460,52 @@ public class AdminController {
      * @param httpSession
      * @return
      */
+    /**
+     * 更新栏目
+     * @param adminEntity，取出栏目名称和id
+     * @param httpSession
+     * @return
+     */
     @PostMapping(value = "/updatecolumn")
-    public Object UpdateColumn(@RequestParam(value = "column")String column, @RequestParam(value = "id")int id, HttpSession httpSession){
+    public Object UpdateColumn(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.UpdateColumn(column,id);
+        return adminService.UpdateColumn(adminEntity.getColumn(),adminEntity.getId());
+    }
+
+    /**
+     * 得到栏目列表
+     * @param page 当前页
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getcolumn")
+    public Object GetColumn(@RequestParam(value = "page", defaultValue = "1")int page, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetColumn(page);
+    }
+
+    /**
+     * 通过id查询具体的栏目
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getcolumn/id={id}")
+    public Object GetColumnById(@PathVariable(value = "id")int id, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetColumnById(id);
     }
 
     /**
@@ -343,51 +587,28 @@ public class AdminController {
     }
 
     /**
-     * 新建一条内容插入首页横向版面
+     * 创建首页横向版面
      * @param name
      * @param content
      * @param priority
      * @param alive
+     * @param httpSession
+     * @return
+     */
+    /**
+     * 创建首页横向版面
+     * @param adminEntity，取出首页横向版面的name,content,priority,alive
      * @param httpSession
      * @return
      */
     @PostMapping(value = "/insertmain")
-    public Object InsertMain(@RequestParam(value = "name")String name,
-                             @RequestParam(value = "content")String content,
-                             @RequestParam(value = "priority")int priority,
-                             @RequestParam(value = "alive",defaultValue = "1")int alive,
-                             HttpSession httpSession){
+    public Object InsertMain(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.InsertMain(name,content,priority,alive);
-    }
-
-    /**
-     * 更新首页横向版面任意一条
-     * @param id
-     * @param name
-     * @param content
-     * @param priority
-     * @param alive
-     * @param httpSession
-     * @return
-     */
-    @PostMapping(value = "/updatetmain")
-    public Object UpdateMain(@RequestParam(value = "id") int id,
-                             @RequestParam(value = "name",required = false)String name,
-                             @RequestParam(value = "content", required = false)String content,
-                             @RequestParam(value = "priority")int priority,
-                             @RequestParam(value = "alive")int alive,
-                             HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.UpdateMain(id,name,content,priority,alive);
+        return adminService.InsertMain(adminEntity.getName(),adminEntity.getContent(),adminEntity.getPriority(),adminEntity.getAlive());
     }
 
     /**
@@ -395,14 +616,78 @@ public class AdminController {
      * @param id
      * @return
      */
+    /**
+     * 删除首页横向版面任意一条
+     * @param adminEntity，取出首页横向版面的id
+     * @param httpSession
+     * @return
+     */
     @PostMapping(value = "/deletemain")
-    public Object DeleteMain(@RequestParam(value = "id") int id, HttpSession httpSession){
+    public Object DeleteMain(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.DeleteMain(id);
+        return adminService.DeleteMain(adminEntity.getId());
+    }
+
+    /**
+     * 更新首页横向版面
+     * @param id
+     * @param name
+     * @param content
+     * @param priority
+     * @param alive
+     * @param httpSession
+     * @return
+     */
+    /**
+     * 更新首页横向版面
+     * @param adminEntity，取出id,name,content,priority,alive
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/updatetmain")
+    public Object UpdateMain(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.UpdateMain(adminEntity.getId(),adminEntity.getName(),adminEntity.getContent(),adminEntity.getPriority(),adminEntity.getAlive());
+    }
+
+    /**
+     * 通过id查询具体的首页横向版面
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getmain/id={id}")
+    public Object GetMainById(@PathVariable(value = "id") int id, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetMainById(id);
+    }
+
+    /**
+     * 得到首页横向版面的列表
+     * @param page 当前页
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getmain")
+    public Object GetMain(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetMain(page);
     }
 
     /**
@@ -426,6 +711,11 @@ public class AdminController {
         }
         String s = file.getOriginalFilename();
         String a[] = s.split("\\.");
+        File dest = new File(infocenterpath);
+        // 检测是否存在目录
+        if (!dest.exists()) {
+            dest.mkdirs();
+        }
         File file1 = new File(infocenterpath,RandomUtil.getRandomFileName() + "." + a[a.length - 1]);
         if (!file1.exists()) {
             try {
@@ -438,6 +728,27 @@ public class AdminController {
             }
         }
         return adminService.CreateInfoCenter(name,file1.getName(),priority,alive);
+    }
+
+    /**
+     * 21. 删除资料中心
+     * @param id
+     * @return
+     */
+    /**
+     * 删除资料中心的一条资料
+     * @param adminEntity，取出id
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/deleteinfocenter")
+    public Object DeleteInfoCenter(@RequestBody AdminEntity adminEntity, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.DeleteInfoCenter(adminEntity.getId());
     }
 
     /**
@@ -461,36 +772,56 @@ public class AdminController {
         if (map != null) {
             return map;
         }
-        String s = file.getOriginalFilename();
-        String a[] = s.split("\\.");
-        File file1 = new File(infocenterpath,RandomUtil.getRandomFileName() + "." + a[a.length - 1]);
-        if (!file1.exists()) {
-            try {
-                file1.createNewFile();
-                FileOutputStream fileOutputStream = new FileOutputStream(file1);
-                fileOutputStream.write(file.getBytes());
-                fileOutputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        String fileName = "";
+        if (file != null){
+            String s = file.getOriginalFilename();
+            String a[] = s.split("\\.");
+            File file1 = new File(infocenterpath,RandomUtil.getRandomFileName() + "." + a[a.length - 1]);
+            if (!file1.exists()) {
+                try {
+                    file1.createNewFile();
+                    FileOutputStream fileOutputStream = new FileOutputStream(file1);
+                    fileOutputStream.write(file.getBytes());
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            fileName = file1.getName();
         }
-
-        return adminService.UpdateInfoCenter(id,name,file1.getName(),priority,alive);
+        return adminService.UpdateInfoCenter(id,name,fileName,priority,alive);
     }
 
     /**
-     * 21. 删除资料中心
+     * 通过id查找具体的资料中心
      * @param id
+     * @param httpSession
      * @return
      */
-    @PostMapping(value = "/deleteinfocenter")
-    public Object DeleteInfoCenter(@RequestParam(value = "id") int id, HttpSession httpSession){
+    @GetMapping(value = "/getinfocenter/id={id}")
+    public Object GetInfoCenterById(@PathVariable(value = "id") int id, HttpSession httpSession) {
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.DeleteInfoCenter(id);
+        return adminService.GetInfoCenterById(id);
+    }
+
+    /**
+     * 得到资料中心列表
+     * @param page 当前页
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getinfocenter")
+    public Object GetInfoCenter(@RequestParam(value = "page", defaultValue = "1") int page, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetInfoCenter(page);
     }
 
     /**
@@ -509,6 +840,22 @@ public class AdminController {
     }
 
     /**
+     * 删除友情链接
+     * @param link,取出id
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/deletelink")
+    public Object DeleteLink(@RequestBody FriendLink link, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.DeleteLink(link.getId());
+    }
+
+    /**
      * 23. 更新友情链接
      * @param link
      * @return
@@ -524,42 +871,7 @@ public class AdminController {
     }
 
     /**
-     * 24. 删除友情链接
-     * @param id
-     * @return
-     */
-    @PostMapping(value = "/deletelink")
-    public Object DeleteLink(@RequestParam(value = "id") int id, HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.DeleteLink(id);
-    }
-
-/**
- * lfx
- */
-
-    /**
-     *得到要查询的用户
-     * @param userCondition 查询条件
-     * @param httpSession
-     * @return
-     */
-    @PostMapping(value = "/searchuser")
-    public Object SearchUser(@RequestBody UserCondition userCondition, HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.SearchUser(userCondition);
-    }
-
-    /**
-     *得到page页的友情链接
+     *查询友情链接
      * @param page 当前页
      * @param httpSession
      * @return
@@ -574,121 +886,20 @@ public class AdminController {
         return adminService.SearchLink(page);
     }
 
-
     /**
-     * 通过公告标题来查询公告
-     * @param title
-     * @param page
-     * @param httpSession
-     * @return
-     */
-    @PostMapping(value = "/getannouncement")
-    public Object GetAnnouncement(@RequestParam(value = "title",defaultValue = "")String title
-            , @RequestParam(value = "page",defaultValue = "1") int page
-            , HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.GetAnnouncement(title, page);
-    }
-
-    /**
-     * 通过id得到具体公告
+     * 通过id查询具体的友情链接
      * @param id
-     * @return
-     */
-    @GetMapping(value = "/getannouncement/id={id}")
-    public Object GetAnnouncement(@PathVariable(value = "id")int id) {
-
-        return adminService.GetAnnouncement(id);
-    }
-
-    //TODO 还没写完
-    /**
-     * 更新公告
-     * @param id
-     * @param file
-     * @param title
-     * @param content
-     * @param pic
      * @param httpSession
      * @return
      */
-    @PostMapping(value = "/updateannouncement")
-    public Object UpdateAnnouncement(@RequestParam(value = "id")int id, @RequestParam(value = "title") String title,
-                                     @RequestParam(value = "content") String content,@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "pic", required = false) String pic,
-                                     HttpSession httpSession) {
-
+    @GetMapping(value = "/getlink/id={id}")
+    public Object GetLinkById(@PathVariable(value = "id") int id, HttpSession httpSession) {
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        //判断公告附件和公告图片是否修改
-        Announcement announcement = new Announcement();
-        announcement.setId(id);
-        if(file != null) {
-            String s = file.getOriginalFilename();
-            String a[] = s.split("\\.");
-            File file1 = new File(anpath,RandomUtil.getRandomFileName() + "." + a[a.length - 1]);
-            if (!file1.exists()) {
-                try {
-                    file1.createNewFile();
-                    FileOutputStream fileOutputStream = new FileOutputStream(file1);
-                    fileOutputStream.write(file.getBytes());
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            announcement.setTitle(title);
-            announcement.setContent(content);
-            announcement.setDate_pub(new Date());
-            announcement.setUpload(file1.getName());
-        }else {
-            announcement.setTitle(title);
-            announcement.setContent(content);
-            announcement.setDate_pub(new Date());
-        }
-        if (pic != null) {
-            announcement.setPic(pic);
-        }
-
-        return adminService.UpdateAnnouncement(announcement);
-    }
-
-    /**
-     * 得到学术领域的列表
-     * @param page 当前页
-     * @param httpSession
-     * @return
-     */
-    @GetMapping(value = "/getacademicsec")
-    public Object GetAcademicsec(@RequestParam(value = "page",defaultValue = "1") int page, HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.GetAcademicsec(page);
-    }
-
-    /**
-     * 根据id来删除学术领域
-     * @param id 学术领域的id
-     * @param httpSession
-     * @return
-     */
-    @PostMapping(value = "/deleteacademicsec")
-    public Object DeleteAcademicsec(@RequestParam(value = "id") int id, HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.DeleteAcademicsec(id);
+        return adminService.GetLinkById(id);
     }
 
     /**
@@ -708,6 +919,28 @@ public class AdminController {
     }
 
     /**
+     * 删除证书
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    /**
+     * 删除证书
+     * @param certificate，取出id
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/deletecertificate")
+    public Object DeleteCertificate(@RequestBody Certificate certificate, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.DeleteCertificate(certificate.getId());
+    }
+
+    /**
      * 更新证书
      * @param certificate
      * @param httpSession
@@ -721,22 +954,6 @@ public class AdminController {
         }
 
         return adminService.UpdateCertificate(certificate);
-    }
-
-    /**
-     * 删除证书
-     * @param id
-     * @param httpSession
-     * @return
-     */
-    @PostMapping(value = "/deletecertificate")
-    public Object DeleteCertificate(@RequestParam(value = "id") int id, HttpSession httpSession){
-        Map map = VerifyAdmin(httpSession);
-        if (map != null) {
-            return map;
-        }
-
-        return adminService.DeleteCertificate(id);
     }
 
     /**
@@ -756,20 +973,42 @@ public class AdminController {
     }
 
     /**
+     * 通过id查询具体的证书信息
+     * @param id
+     * @param httpSession
+     * @return
+     */
+    @GetMapping(value = "/getcertificate/id={id}")
+    public Object GetCertificateById(@PathVariable(value = "id") int id, HttpSession httpSession){
+        Map map = VerifyAdmin(httpSession);
+        if (map != null) {
+            return map;
+        }
+
+        return adminService.GetCertificateById(id);
+    }
+
+    /**
      * 是否启用证书
      * @param id
      * @param alive
      * @param httpSession
      * @return
      */
-    @GetMapping(value = "/updatecertificatealive")
-    public Object UpdateCertificateAlive(@RequestParam(value = "id") int id,@RequestParam(value = "alive") int alive,HttpSession httpSession) {
+    /**
+     * 是否启用证书
+     * @param certificate，取出id和alive
+     * @param httpSession
+     * @return
+     */
+    @PostMapping(value = "/updatecertificatealive")
+    public Object UpdateCertificateAlive(@RequestBody Certificate certificate,HttpSession httpSession) {
         Map map = VerifyAdmin(httpSession);
         if (map != null) {
             return map;
         }
 
-        return adminService.UpdateCertificateAlive(id, alive);
+        return adminService.UpdateCertificateAlive(certificate.getId(), certificate.getAlive());
     }
 
     /**
@@ -837,8 +1076,7 @@ public class AdminController {
      * @return
      */
     private Map VerifyAdmin(HttpSession httpSession) {
-        //int adminrole = (int) httpSession.getAttribute(WebSecurityConfig.SESSION_ROLE);
-        int adminrole = 0;
+        int adminrole = (int) httpSession.getAttribute(WebSecurityConfig.SESSION_ROLE);
 
         if(adminrole != 0){
             Map<String, Object> result = new HashMap<>();
@@ -849,11 +1087,4 @@ public class AdminController {
 
         return null;
     }
-
-
-
-
-/**
- * lfx
- */
 }

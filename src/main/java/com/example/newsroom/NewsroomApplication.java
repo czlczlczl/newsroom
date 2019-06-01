@@ -12,7 +12,7 @@ import javax.servlet.MultipartConfigElement;
 
 @SpringBootApplication
 @EnableScheduling
-//@EnableCaching
+@EnableCaching
 public class NewsroomApplication {
 
 	public static void main(String[] args) {

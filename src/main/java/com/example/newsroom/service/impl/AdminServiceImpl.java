@@ -133,6 +133,59 @@ public class AdminServiceImpl implements AdminService{
         return map;
     }
 
+    @Override
+    public Map<String, Object> GetUserById(int id, int role) {
+
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        List<HashMap<String, Object>> res = adminMapper.GetUserById(id,role);
+
+        if(res != null){
+            result = 1;
+            map.put("user",res);
+        }
+        map.put("result", result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> UpdateUser(JSONObject user, int role) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        switch (role){
+            case 2:
+                Integer a;
+                Editor editor1 = JSONObject.toJavaObject(user,Editor.class);
+                a = adminMapper.UpdateUser(editor1, role);
+                if (a != null) {
+                    result = 1;
+                }
+                break;
+            case 3:
+                Integer b;
+                Editor editor2 = JSONObject.toJavaObject(user,Editor.class);
+                b = adminMapper.UpdateUser(editor2, role);
+                if (b != null) {
+                    result = 1;
+                }
+                break;
+            case 4:
+                Integer c;
+                Professor professor = JSONObject.toJavaObject(user,Professor.class);
+                c = adminMapper.UpdateUser(professor, role);
+                if (c != null) {
+                    result = 1;
+                }
+            default:
+                break;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
     /**
      * 重置密码
      * @param username
@@ -278,6 +331,53 @@ public class AdminServiceImpl implements AdminService{
         return map;
     }
 
+    @Override
+    public Map<String, Object> GetAcademicsecById(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+        List<HashMap<String, Object>> res = adminMapper.GetAcademicsecById(id);
+
+        if(res != null){
+            result = 1;
+            map.put("academicsec",res);
+        }
+        map.put("result", result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> GetAcademicsec(int page) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        int count = adminMapper.GetAcademicsecCount();
+        PageBean pageBean = new PageBean(page,count);
+        List<HashMap<String, Object>> list = adminMapper.GetAcademicsec(pageBean.getStartIndex());
+        pageBean.setRows(list);
+        if (list != null) {
+            map.put("pageBean", pageBean);
+            result = 1;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> DeleteAcademicsec(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+        int num = adminMapper.DeleteAcademicsec(id);
+
+        if (num == 1) {
+            result = 1;
+            map.put("result",result);
+            return map;
+        }
+        map.put("result",result);
+        return map;
+    }
+
     /**
      * 创建栏目
      * @param column
@@ -317,6 +417,53 @@ public class AdminServiceImpl implements AdminService{
 
         if(res != null){
             result = 1;
+        }
+        map.put("result", result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> DeleteColumn(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+        int num = adminMapper.DeleteColumn(id);
+
+        if (num == 1) {
+            result = 1;
+        }
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> GetColumn(int page) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        int count = adminMapper.GetColumnCount();
+        PageBean pageBean = new PageBean(page,count);
+        List<HashMap<String, Object>> list = adminMapper.GetColumn(pageBean.getStartIndex());
+        pageBean.setRows(list);
+
+        if (list != null) {
+            map.put("pageBean", pageBean);
+            result = 1;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> GetColumnById(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        List<HashMap<String, Object>> res = adminMapper.GetColumnById(id);
+
+        if(res != null){
+            result = 1;
+            map.put("column",res);
         }
         map.put("result", result);
         return map;
@@ -515,6 +662,9 @@ public class AdminServiceImpl implements AdminService{
         List<String> data_atta = new ArrayList<String>();
         List<HashMap<String, Object>> piclist = adminMapper.GetAnnouncementInfoList(1);
         List<HashMap<String, Object>> attalist = adminMapper.GetAnnouncementInfoList(2);
+        //因为证书图片上传路径采用公告的，防止误删
+        List<HashMap<String, Object>> certificate = adminMapper.GetAnnouncementInfoList(3);
+        piclist.addAll(certificate);
 
         //得到数据库公告图片列表
         for(HashMap<String, Object> hashMap: piclist){
@@ -618,6 +768,40 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    public Map<String, Object> GetMainById(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        List<HashMap<String, Object>> res = adminMapper.GetMainById(id);
+
+        if(res != null){
+            result = 1;
+            map.put("main",res);
+        }
+        map.put("result", result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> GetMain(int page) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        int count = adminMapper.GetMainCount();
+        PageBean pageBean = new PageBean(page,count);
+        List<HashMap<String, Object>> list = adminMapper.GetMain(pageBean.getStartIndex());
+        pageBean.setRows(list);
+
+        if (list != null) {
+            map.put("pageBean", pageBean);
+            result = 1;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
     public Map<String, Object> CreateInfoCenter(String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -640,18 +824,17 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public Map<String, Object> UpdateInfoCenter(int id, String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> list;
         Integer res;
         int result = 0;
 
-        list = commonMapper.GetInfoCenterList();
+        /*list = commonMapper.GetInfoCenterList();
         HashMap a = list.get(id-1);
         File file = new File(FileController.infocenterpath, (String) a.get("content"));
         if (file.exists()){
             file.delete();
-        }
+        }*/
 
-        res = adminMapper.UpdateInfoCenter(id,name,content,priority,alive);
+        res = adminMapper.UpdateInfoCenter(id,name,content,priority,alive,new Date());
 
         if(res != null){
             result = 1;
@@ -661,10 +844,68 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    public Map<String, Object> GetInfoCenterById(int id) {
+
+        Map<String, Object> map = new HashMap<>();
+        List<HashMap<String, Object>> res;
+        int result = 0;
+
+        res = adminMapper.GetInfoCenterById(id);
+
+        if(res != null){
+            result = 1;
+            map.put("infoCenter",res);
+        }
+        map.put("result", result);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> GetInfoCenter(int page) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        int count = adminMapper.GetInfoCenterCount();
+        PageBean pageBean = new PageBean(page,count);
+        List<HashMap<String, Object>> list = adminMapper.GetInfoCenter(pageBean.getStartIndex());
+        pageBean.setRows(list);
+
+        if (list != null) {
+            map.put("pageBean", pageBean);
+            result = 1;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
     public Map<String, Object> DeleteInfoCenter(int id) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
         int result = 0;
+
+        List<HashMap<String, Object>> infoCenter = adminMapper.GetInfoCenterById(id);
+
+        if(infoCenter.size() == 0){
+            result = 1;
+            map.put("result",result);
+            return map;
+        }
+        String content = (String) infoCenter.get(0).get("content");
+        if (content != null) {
+            String path = "./file/InfoCenter";
+            File file = new File(path, content);
+            if (file.exists()) {
+                boolean i = file.delete();
+                if (!i) {
+                    String error = "资料删除失败\n";
+                    map.put("result", result);
+                    map.put("error", error);
+                    return map;
+                }
+            }
+        }
 
         res = adminMapper.DeleteInfoCenter(id);
 
@@ -675,9 +916,6 @@ public class AdminServiceImpl implements AdminService{
         return map;
     }
 
-/**
-*lfx
-*/
     /**
      * 插入一条新的友情链接
      * @param link
@@ -763,6 +1001,21 @@ public class AdminServiceImpl implements AdminService{
         return map;
     }
 
+    @Override
+    public Map<String, Object> GetLinkById(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+        List<HashMap<String, Object>> list = adminMapper.GetLinkById(id);
+
+        if (list != null) {
+            map.put("link", list);
+            result = 1;
+        }
+
+        map.put("result",result);
+        return map;
+    }
+
     /**
      * 通过条件来对用户进行分页
      * @param userCondition
@@ -783,39 +1036,6 @@ public class AdminServiceImpl implements AdminService{
             result = 1;
         }
 
-        map.put("result",result);
-        return map;
-    }
-
-    @Override
-    public Map<String, Object> GetAcademicsec(int page) {
-        Map<String, Object> map = new HashMap<>();
-        int result = 0;
-
-        int count = adminMapper.GetAcademicsecCount();
-        PageBean pageBean = new PageBean(page,count);
-        List<HashMap<String, Object>> list = adminMapper.GetAcademicsec(pageBean.getStartIndex());
-        pageBean.setRows(list);
-        if (list != null) {
-            map.put("pageBean", pageBean);
-            result = 1;
-        }
-
-        map.put("result",result);
-        return map;
-    }
-
-    @Override
-    public Map<String, Object> DeleteAcademicsec(int id) {
-        Map<String, Object> map = new HashMap<>();
-        int result = 0;
-        int num = adminMapper.DeleteAcademicsec(id);
-
-        if (num == 1) {
-            result = 1;
-            map.put("result",result);
-            return map;
-        }
         map.put("result",result);
         return map;
     }
@@ -859,6 +1079,27 @@ public class AdminServiceImpl implements AdminService{
         Integer res;
         int result = 0;
 
+        List<HashMap<String, Object>> certificate = adminMapper.GetCertificateById(id);
+        if(certificate.size() == 0){
+            result = 1;
+            map.put("result",result);
+            return map;
+        }
+        String pic = (String) certificate.get(0).get("pic");
+        if (pic != null) {
+            String path = "./file/AnnouncementPic";
+            File file = new File(path, pic);
+            if (file.exists()) {
+                boolean i = file.delete();
+                if (!i) {
+                    String error = "证书删除失败\n";
+                    map.put("result", result);
+                    map.put("error", error);
+                    return map;
+                }
+            }
+        }
+
         res = adminMapper.DeleteCertificate(id);
 
         if(res != null){
@@ -887,6 +1128,20 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    public Map<String, Object> GetCertificateById(int id) {
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        List<HashMap<String, Object>> res = adminMapper.GetCertificateById(id);
+        if (res != null) {
+            map.put("certificate", res);
+            result = 1;
+        }
+        map.put("result",result);
+        return map;
+    }
+
+    @Override
     public Map<String, Object> UpdateCertificateAlive(int id, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -907,7 +1162,7 @@ public class AdminServiceImpl implements AdminService{
         Map<String, Object> map = new HashMap<>();
         int result = 0;
 
-        int count = adminMapper.SearchAnnouncementCount(title);
+        int count = adminMapper.SearchAnnouncementCount(title, page);
         PageBean pageBean = new PageBean(page, count);
         List<HashMap<String, Object>> list = adminMapper.SearchAnnouncement(title,pageBean.getStartIndex());
         pageBean.setRows(list);

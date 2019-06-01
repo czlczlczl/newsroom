@@ -12,6 +12,8 @@ import com.example.newsroom.service.CommonService;
 import com.example.newsroom.util.Sha256;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -153,11 +155,10 @@ public class CommonServiceImpl implements CommonService{
         String b = (String)safeque.get("safeque2");
         String c = (String)safeque.get("safeque3");
 
-        String safeque1[] = a.split(";");
-        String safeque2[] = b.split(";");
-        String safeque3[] = c.split(";");
-
-        int ad = Integer.valueOf((String)safeque2[0]);
+        //记录安全问题及答案是用问题id:答案的形式，如“1:电子科技大学”
+        String safeque1[] = a.split(":");
+        String safeque2[] = b.split(":");
+        String safeque3[] = c.split(":");
 
         que.put("que1",commonMapper.GetQueById(Integer.valueOf(safeque1[0])));
         que.put("que2",commonMapper.GetQueById(Integer.valueOf(safeque2[0])));
@@ -215,6 +216,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "AnnouncementList")
     public Map<String, Object> GetAnnouncementList(int num) {
         List<HashMap<String, Object>> announcementlist;
         Map<String, Object> map = new HashMap<>();
@@ -240,6 +242,7 @@ public class CommonServiceImpl implements CommonService{
     }
 
     @Override
+    @Cacheable(cacheNames= "Announcement",key="#id")
     public Map<String, Object> GetAnnouncement(int id) {
         HashMap announcement;
         Map<String, Object> map = new HashMap<>();
@@ -260,6 +263,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "LatestArticleList")
     public Map<String, Object> GetLatestArticleList(int num) {
         List<HashMap<String, Object>> articlelist;
         Map<String, Object> map = new HashMap<>();
@@ -285,6 +289,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "Article",key="#id")
     public Map<String, Object> GetArticle(int id) {
         HashMap article;
         Map<String, Object> map = new HashMap<>();
@@ -304,6 +309,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "Type",key="#type")
     public Map<String, Object> GetType(String type) {
         List<HashMap<String, Object>> typelist;
         Map<String, Object> map = new HashMap<>();
@@ -329,6 +335,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "MainList")
     public Map<String, Object> GetMainList() {
         List<HashMap<String, Object>> mainlist;
         Map<String, Object> map = new HashMap<>();
@@ -350,6 +357,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
+    @Cacheable(cacheNames= "Main",key="#id")
     public Map<String, Object> GetMain(int id) {
         String main;
         Map<String, Object> map = new HashMap<>();
@@ -365,6 +373,7 @@ public class CommonServiceImpl implements CommonService{
     }
 
     @Override
+    @Cacheable(cacheNames= "InfoCenterList")
     public Map<String, Object> GetInfoCenterList() {
         List<HashMap<String, Object>> infocenterlist;
         Map<String, Object> map = new HashMap<>();
@@ -381,6 +390,7 @@ public class CommonServiceImpl implements CommonService{
     }
 
     @Override
+    @Cacheable(cacheNames= "LinkList")
     public Map<String, Object> GetLinkList() {
         List<HashMap<String, Object>> linklist;
         Map<String, Object> map = new HashMap<>();
@@ -397,6 +407,7 @@ public class CommonServiceImpl implements CommonService{
     }
 
     @Override
+    @Cacheable(cacheNames= "GetCertificate")
     public Map<String, Object> GetCertificate() {
         List<HashMap<String, Object>> certificatelist;
         Map<String, Object> map = new HashMap<>();

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+//首页或者公用的功能
 @RestController
 @RequestMapping(value = "/common")
 public class CommonController {
@@ -62,9 +63,7 @@ public class CommonController {
         int role = userlogin.getRole();
         int result,res;
 
-        if(role != 0) {
-            userpassword = Sha256.getSHA256StrJava(username + userpassword);
-        }
+        userpassword = Sha256.getSHA256StrJava(username + userpassword);
 
         result = (int)commonService.LoginVerify(username,userpassword,role).get("result");
         if(result == 1 ){
@@ -81,7 +80,7 @@ public class CommonController {
                 System.out.println(httpSession.getAttribute(WebSecurityConfig.SESSION_NAME));
                 map.put("name",user.get("name"));
                 map.put("role", user.get("role"));
-                map.put("username",user.get("username"));
+                map.put("username",username);
                 map.put("id", user.get("id"));
             }
             res = 1;
@@ -211,20 +210,5 @@ public class CommonController {
     public Object GetCertificate(){
         return commonService.GetCertificate();
     }
-
-//    @GetMapping(value = "/certpic")
-//    public Object fas(){
-//        return commonService.GetCertificate();
-//    }
-//
-//    @GetMapping(value = "/getintro")
-//    public Object GetCertificffas(){
-//        return commonService.GetCertificate();
-//    }
-//
-//    @GetMapping(value = "/gettips")
-//    public Object GetCertificafsd(){
-//        return commonService.GetCertificate();
-//    }
 
 }

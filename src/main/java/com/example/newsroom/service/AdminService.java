@@ -20,6 +20,10 @@ public interface AdminService {
 
     Map<String, Object> GetUser(int role, int page);
 
+    Map<String, Object> GetUserById(int id, int role);
+
+    Map<String, Object> UpdateUser(JSONObject user, int role);
+
     Map<String, Object> ResetPassword(String username, int role);
 
     Map<String, Object> DeleteUser(String username, int role);
@@ -30,9 +34,21 @@ public interface AdminService {
 
     Map<String, Object> UpdateAcademicsec(String academicesc, int id);
 
+    Map<String, Object> GetAcademicsecById(int id);
+
+    Map<String, Object> GetAcademicsec(int page);
+
+    Map<String, Object> DeleteAcademicsec(int id);
+
     Map<String, Object> CreateColumn(String coulumn);
 
     Map<String, Object> UpdateColumn(String coulumn, int id);
+
+    Map<String, Object> DeleteColumn(int id);
+
+    Map<String, Object> GetColumn(int page);
+
+    Map<String, Object> GetColumnById(int id);
 
     Map<String, Object> GetStandardList();
 
@@ -52,9 +68,17 @@ public interface AdminService {
 
     Map<String, Object> DeleteMain(int id);
 
+    Map<String, Object> GetMainById(int id);
+
+    Map<String, Object> GetMain(int page);
+
     Map<String, Object> CreateInfoCenter(String name, String content, int priority, int alive);
 
     Map<String, Object> UpdateInfoCenter(int type, String name, String content, int priority, int alive);
+
+    Map<String, Object> GetInfoCenterById(int id);
+
+    Map<String, Object> GetInfoCenter(int page);
 
     Map<String, Object> DeleteInfoCenter(int id);
 
@@ -66,11 +90,9 @@ public interface AdminService {
 
     Map<String, Object> SearchLink(int page);
 
+    Map<String, Object> GetLinkById(int id);
+
     Map<String, Object> SearchUser(UserCondition userCondition);
-
-    Map<String, Object> GetAcademicsec(int page);
-
-    Map<String, Object> DeleteAcademicsec(int id);
 
     Map<String, Object> InsertCertificate(Certificate certificate);
 
@@ -79,6 +101,8 @@ public interface AdminService {
     Map<String, Object> DeleteCertificate(int id);
 
     Map<String, Object> SearchCertificate(int page);
+
+    Map<String, Object> GetCertificateById(int id);
 
     Map<String, Object> UpdateCertificateAlive(int id, int alive);
 
