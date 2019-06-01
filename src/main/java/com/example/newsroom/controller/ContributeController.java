@@ -542,8 +542,8 @@ public class ContributeController {
     @PostMapping(value = "/task/judge")
     public Object judgeArticle(@RequestBody All all, HttpSession session) {
         Task task = all.getTask();
-        task.setId_role((int)session.getAttribute("id"));
-        task.setRole((int)session.getAttribute("role"));
+        //task.setId_role((int)session.getAttribute("id"));
+        //task.setRole((int)session.getAttribute("role"));
         int[] id_role = all.getId_role();
         Map<String, Object> map = new HashMap<>();
         Integer result = 0;
@@ -559,7 +559,7 @@ public class ContributeController {
             result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),1,new Date());
             if(result != null && result == 1){
                 data = "";
-                result = contributeService.checkTaskLink(task.getId_article(),0,0);
+                result = contributeService.checkTaskLink(task.getId_article(),-1, 0,0);
                 if(result == 0){//所有审稿人完成审稿
                     task.setId_role(contributeService.getRoleIdByTask(task.getId_article(), task.getRole()).get(0));
                     String content  = new String();
@@ -568,7 +568,7 @@ public class ContributeController {
                         content += professors.get(i) + ":" + contributeService.getContentByRoleId(professors.get(i)) + ";";
                     }
                     task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
-                    result = contributeService.checkTaskLink(task.getId_article(),3,1);
+                    result = contributeService.checkTaskLink(task.getId_article(),1, 3,1);
                     if(result != 0){
                         task.setStat(7);
                     }
@@ -864,6 +864,7 @@ public class ContributeController {
                 if(task.getContent() == null){//审稿费审核通过
                     if(result == null || result == 1) {
                         for(int i = 0;i < id_role.length;i++){
+                            task.setStat(1);
                             task.setDate(new Date());
                             result = contributeService.createTask(task);
                             if(result == null || result != 1){
@@ -873,8 +874,6 @@ public class ContributeController {
                     }
                 }
                 else{//版面费审核通过
-                    task.setId_role(1);
-                    task.setRole(2);
                     task.setDate(new Date());
                     result = contributeService.createTask(task);
                 }

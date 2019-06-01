@@ -36,6 +36,6 @@ public interface ContributeMapper {
     Integer getCountByDatePub(@Param(value = "begin") Date begin,@Param(value = "end") Date end);
     Integer getCountByTaskInfo(@Param(value = "id_role") int id_role,@Param(value = "role") int role,@Param(value = "stat") int stat,@Param(value = "flag") int flag,@Param(value = "begin") Date begin,@Param(value = "end") Date end);
     Integer getEditorByAcadamic(@Param(value = "id") int id);
-    Integer checkTaskLink(@Param(value = "id_article") int id_article,@Param(value = "role") int role,@Param(value = "flag") int flag);
+    Integer checkTaskLink(@Param(value = "id_article") int id_article,@Param(value="stat") int stat, @Param(value = "role") int role,@Param(value = "flag") int flag);
     Integer uploadSchedule(@Param(value = "title") String title,@Param(value = "date_pub") Date date_pub);
 }

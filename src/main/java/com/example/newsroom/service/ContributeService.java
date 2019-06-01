@@ -28,6 +28,6 @@ public interface ContributeService {
     Integer getCountByDatePub(Date begin,Date end);
     Integer getCountByTaskInfo(int id_role,int role,int stat,int flag,Date begin,Date end);
     Integer getEditorByAcadamic(int id);
-    Integer checkTaskLink(int id_article,int role,int flag);
+    Integer checkTaskLink(int id_article,int stat, int role,int flag);
     Integer uploadSchedule(String title,Date date_pub);
 }
