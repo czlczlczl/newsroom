@@ -252,9 +252,9 @@ public class ContributeServiceimpl implements ContributeService{
     }
 
     @Override
-    public Integer checkTaskLink(int id_article,int role,int flag){
+    public Integer checkTaskLink(int id_article,int stat, int role,int flag){
         try{
-            return contributeMapper.checkTaskLink(id_article,role,flag);
+            return contributeMapper.checkTaskLink(id_article,stat,role,flag);
         }
         catch (Exception e){
             System.out.println(e);
