@@ -292,6 +292,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+
     public Map<String, Object> CreateAcademicsec(String academicsec) {
         Map<String, Object> map = new HashMap<>();
         Integer res = null;
@@ -1192,6 +1193,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+
     public Map<String, Object> UpdateAnnouncement(Announcement announcement) {
         Map<String, Object> map = new HashMap<>();
         Integer res;

@@ -130,11 +130,11 @@
 			<!--<groupId>net.sf.ehcache</groupId>-->
 			<!--<artifactId>ehcache</artifactId>-->
 		<!--</dependency>-->
-<!--&lt;!&ndash;redis&ndash;&gt;-->
-		<!--<dependency>-->
-			<!--<groupId>org.springframework.boot</groupId>-->
-			<!--<artifactId>spring-boot-starter-data-redis</artifactId>-->
-		<!--</dependency>-->
+<!--redis-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
 
 
 		<!--<dependency>-->

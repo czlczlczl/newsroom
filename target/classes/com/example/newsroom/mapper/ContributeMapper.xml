@@ -315,9 +315,6 @@
             WHERE id_role = #{id_role} AND role = #{role} AND flag = #{flag}
             <if test="role != 2">
                 <if test="stat != -1">
-                    <if test="stat == 0">
-                        AND (stat != 4 AND stat != 6)
-                    </if>
                     <if test="stat == 1">
                         AND (stat = 4 OR stat = 6)
                     </if>
@@ -400,6 +397,9 @@
 
     <select id="checkTaskLink" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM tasks WHERE id_article = #{id_article}
+        <if test="stat != -1">
+            AND stat = #{stat}
+        </if>
         <if test="role != 0">
             AND role = #{role}
         </if>
