@@ -1209,7 +1209,11 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+<<<<<<< HEAD
     @CachePut(cacheNames= "Announcement",key="#announcement.id")
+=======
+
+>>>>>>> c9112ba572c2fc5b7756324a77649e81bfe305a2
     public Map<String, Object> UpdateAnnouncement(Announcement announcement) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
