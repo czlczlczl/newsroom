@@ -9,6 +9,8 @@ import com.example.newsroom.entity.*;
 import com.example.newsroom.service.AdminService;
 import com.example.newsroom.util.Sha256;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+    @CachePut(cacheNames= "LasAnnouncementList")
     public Map<String, Object> CreateAnnouncement(Announcement announcement) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -54,6 +57,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+    @CacheEvict(cacheNames= "Announcement",key="#id")
     public Map<String, Object> DeleteAnnouncement(int id) {
         String attapath ="./file/AnnouncementAnnexes";
         String picpath ="./file/AnnouncementPic";
@@ -292,6 +296,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+
     public Map<String, Object> CreateAcademicsec(String academicsec) {
         Map<String, Object> map = new HashMap<>();
         Integer res = null;
@@ -723,6 +728,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "MainList")
     public Map<String, Object> InsertMain(String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -738,6 +744,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "Main",key="#id")
     public Map<String, Object> UpdateMain(int id, String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -753,6 +760,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CacheEvict(cacheNames= "Main",key="#id")
     public Map<String, Object> DeleteMain(int id) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -802,6 +810,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "InfoCenterList")
     public Map<String, Object> CreateInfoCenter(String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -822,6 +831,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "InfoCenterList")
     public Map<String, Object> UpdateInfoCenter(int id, String name, String content, int priority, int alive) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -880,6 +890,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "InfoCenterList")
     public Map<String, Object> DeleteInfoCenter(int id) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -922,6 +933,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+    @CachePut(cacheNames= "LinkList")
     public Map<String, Object> InsertLink(FriendLink link) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -942,6 +954,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+    @CachePut(cacheNames= "LinkList")
     public Map<String, Object> UpdateLink(FriendLink link) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -962,6 +975,7 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
+    @CachePut(cacheNames= "LinkList")
     public Map<String, Object> DeleteLink(int id) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -1041,6 +1055,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "CertificateList")
     public Map<String, Object> InsertCertificate(Certificate certificate) {
 
         certificate.setDate_pub(new Date());
@@ -1059,6 +1074,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "CertificateList")
     public Map<String, Object> UpdateCertificate(Certificate certificate) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -1074,6 +1090,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "CertificateList")
     public Map<String, Object> DeleteCertificate(int id) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -1192,6 +1209,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    @CachePut(cacheNames= "Announcement",key="#announcement.id")
     public Map<String, Object> UpdateAnnouncement(Announcement announcement) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
@@ -1210,9 +1228,5 @@ public class AdminServiceImpl implements AdminService{
         map.put("result", result);
         return map;
     }
-
-/**
- * lfx
- */
 
 }

@@ -211,12 +211,35 @@ public class CommonServiceImpl implements CommonService{
     }
 
     /**
-     * 公告显示，返回map
+     * 首页公告显示，返回map
+     * @return
+     */
+    @Override
+    @Cacheable(cacheNames= "LasAnnouncementList")
+    public Map<String, Object> GetLasAnnouncementList() {
+        List<HashMap<String, Object>> announcementlist;
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+        announcementlist = commonMapper.GetLasAnnouncementList();
+
+        if(announcementlist != null){
+            result = 1;
+        }else {
+            map.put("result",result);
+            return map;
+        }
+
+        map.put("result",result);
+        map.put("announcementlist",announcementlist);
+        return map;
+    }
+
+    /**
+     * 更多公告显示，返回map
      * @param num
      * @return
      */
     @Override
-    @Cacheable(cacheNames= "AnnouncementList")
     public Map<String, Object> GetAnnouncementList(int num) {
         List<HashMap<String, Object>> announcementlist;
         Map<String, Object> map = new HashMap<>();
@@ -258,19 +281,43 @@ public class CommonServiceImpl implements CommonService{
     }
 
     /**
-     * 最新文章，返回map
-     * @param num
+     * 首页最新文章，返回map
      * @return
      */
     @Override
     @Cacheable(cacheNames= "LatestArticleList")
-    public Map<String, Object> GetLatestArticleList(int num) {
+    public Map<String, Object> GetLatestArticleList() {
         List<HashMap<String, Object>> articlelist;
         Map<String, Object> map = new HashMap<>();
         int result = 0;
 
         Date a = new Date();
-        articlelist = commonMapper.GetLatestArticleList(num,a);
+        articlelist = commonMapper.GetLatestArticleList(a);
+        if(articlelist != null){
+            result = 1;
+        }else {
+            map.put("result",result);
+            return map;
+        }
+
+        map.put("result",result);
+        map.put("articlelist",articlelist);
+        return map;
+    }
+
+    /**
+     * 最新文章，返回map
+     * @param num
+     * @return
+     */
+    @Override
+    public Map<String, Object> GetArticleList(int num) {
+        List<HashMap<String, Object>> articlelist;
+        Map<String, Object> map = new HashMap<>();
+        int result = 0;
+
+        Date a = new Date();
+        articlelist = commonMapper.GetArticleList(num,a);
         if(articlelist != null){
             result = 1;
         }else {
@@ -309,7 +356,6 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
-    @Cacheable(cacheNames= "Type",key="#type")
     public Map<String, Object> GetType(String type) {
         List<HashMap<String, Object>> typelist;
         Map<String, Object> map = new HashMap<>();
@@ -407,7 +453,7 @@ public class CommonServiceImpl implements CommonService{
     }
 
     @Override
-    @Cacheable(cacheNames= "GetCertificate")
+    @Cacheable(cacheNames= "CertificateList")
     public Map<String, Object> GetCertificate() {
         List<HashMap<String, Object>> certificatelist;
         Map<String, Object> map = new HashMap<>();

@@ -232,11 +232,15 @@
         </if>
     </update>
 
+    <select id="GetLasAnnouncementList" resultType="HashMap">
+        select id,title,date_pub from announcements order by date_pub desc limit 0,10;
+    </select>
+
     <select id="GetAnnouncementList" parameterType="java.lang.Integer" resultType="HashMap">
-        <if test="num == -1">
+        <if test="num == 0">
             select id,title,date_pub from announcements order by date_pub desc;
         </if>
-        <if test="num != -1">
+        <if test="num != 0">
             select id,title,date_pub from announcements order by date_pub desc limit 0,#{num};
         </if>
     </select>
@@ -245,15 +249,23 @@
         select * from announcements where id = #{id};
     </select>
 
-    <select id="GetLatestArticleList" parameterType="java.lang.Integer" resultType="HashMap">
-        <if test="num == -1">
+    <select id="GetLatestArticleList" resultType="HashMap">
+        select id,title,date_pub from articles
+        <where>
+            <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%T:%s')   ]]>
+        </where>
+            order by date_pub desc limit 0,10;
+    </select>
+
+    <select id="GetArticleList" parameterType="java.lang.Integer" resultType="HashMap">
+        <if test="num == 0">
             select id,title,date_pub from articles
             <where>
                 <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%T:%s')   ]]>
             </where>
             order by date_pub desc;
         </if>
-        <if test="num != -1">
+        <if test="num != 0">
             select id,title,date_pub from articles
             <where>
                 <![CDATA[  and DATE_FORMAT(date_pub, '%Y-%m-%d %H:%T:%s') <= DATE_FORMAT(#{date}, '%Y-%m-%d %H:%T:%s')   ]]>

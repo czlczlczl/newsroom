@@ -124,12 +124,18 @@ public class CommonController {
     }
 
     /**
-     * 7. 公告列表，返回id和title和date_pub的值
+     * 7. 公告列表，返回id和title和date_pub的值，num为-1时，显示最新十条，即为首页公告列表。为0时，显示所有公告
      * @return
      */
     @GetMapping(value = "/announcementlist/num={num}")
     public Object announcementlist(@PathVariable(value = "num") int num){
-        return commonService.GetAnnouncementList(num);
+        if(num == -1) {
+            return commonService.GetLasAnnouncementList();
+        }
+        if(num >= 0){
+            return commonService.GetAnnouncementList(num);
+        }
+        return null;
     }
 
     /**
@@ -149,7 +155,13 @@ public class CommonController {
      */
     @GetMapping(value = "/articlelist/num={num}")
     public Object LatestArticleList(@PathVariable(value = "num") int num){
-        return commonService.GetLatestArticleList(num);
+        if(num == -1) {
+            return commonService.GetLatestArticleList();
+        }
+        if(num >= 0){
+            return commonService.GetArticleList(num);
+        }
+        return null;
     }
 
     /**

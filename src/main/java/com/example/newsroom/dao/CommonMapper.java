@@ -29,11 +29,15 @@ public interface CommonMapper {
 
     Integer ResetPassword(@Param(value = "resetPwd")ResetPwd resetPwd);
 
+    List<HashMap<String,Object>> GetLasAnnouncementList();
+
     List<HashMap<String,Object>> GetAnnouncementList(@Param(value = "num") int num);
 
     HashMap GetAnnouncement(@Param(value = "id") int id);
 
-    List<HashMap<String,Object>> GetLatestArticleList(@Param(value = "num") int num, @Param(value = "date") Date date);
+    List<HashMap<String,Object>> GetLatestArticleList( @Param(value = "date") Date date);
+
+    List<HashMap<String,Object>> GetArticleList(@Param(value = "num") int num, @Param(value = "date") Date date);
 
     HashMap GetArticle(@Param(value = "id") int id);
 

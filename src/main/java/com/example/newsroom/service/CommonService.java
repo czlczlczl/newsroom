@@ -23,11 +23,15 @@ public interface CommonService {
 
     Map<String, Object> ResetPassword(ResetPwd resetPwd);
 
+    Map<String, Object> GetLasAnnouncementList();
+
     Map<String, Object> GetAnnouncementList(int num);
 
     Map<String, Object> GetAnnouncement(int id);
 
-    Map<String, Object> GetLatestArticleList(int num);
+    Map<String, Object> GetLatestArticleList();
+
+    Map<String, Object> GetArticleList(int num);
 
     Map<String, Object> GetArticle(int id);
 
