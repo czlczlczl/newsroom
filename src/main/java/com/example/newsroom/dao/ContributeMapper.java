@@ -15,7 +15,7 @@ import java.util.Set;
 @Mapper
 @Repository
 public interface ContributeMapper {
-    Integer updateArticleInfo(@Param(value = "id") int id,@Param(value = "format") String format,@Param(value = "date_pub") Date date_pub,@Param(value = "column") int column);
+    Integer updateArticleInfo(@Param(value = "id") int id,@Param(value = "format") String format,@Param(value = "date_pub") Date date_pub,@Param(value = "column") int column,@Param(value = "writer_prefer")String writer_prefer,@Param(value = "writer_avoid")String writer_avoid);
     Integer deleteArticleInfo(@Param(value = "id") int id);
     Integer uploadArticleInfo(Article article);
     Integer updateTask(@Param(value = "id") int id,@Param(value = "id_role") int id_role,@Param(value = "content") String content,@Param(value = "stat") int stat,@Param(value = "role") int role,@Param(value = "flag") int flag,@Param(value = "date") Date date);
@@ -38,4 +38,5 @@ public interface ContributeMapper {
     Integer getEditorByAcadamic(@Param(value = "id") int id);
     Integer checkTaskLink(@Param(value = "id_article") int id_article,@Param(value="stat") int stat, @Param(value = "role") int role,@Param(value = "flag") int flag);
     Integer uploadSchedule(@Param(value = "title") String title,@Param(value = "date_pub") Date date_pub);
+    Object getInfoByRoleId(@Param(value = "stat")int stat,@Param(value = "name") int name,@Param(value = "id_role")int id_role);
 }

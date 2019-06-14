@@ -5,10 +5,9 @@ import com.example.newsroom.entity.Article;
 import com.example.newsroom.entity.Invoice;
 import com.example.newsroom.entity.Task;
 import com.example.newsroom.service.ContributeService;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.omg.PortableInterceptor.INACTIVE;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +19,9 @@ public class ContributeServiceimpl implements ContributeService{
     ContributeMapper contributeMapper;
 
     @Override
-    public Integer updateArticleInfo(int id,String format,Date date_pub,int column){
+    public Integer updateArticleInfo(int id,String format,Date date_pub,int column,String writer_prefer,String writer_avoid){
         try{
-            return contributeMapper.updateArticleInfo(id,format,date_pub,column);
+            return contributeMapper.updateArticleInfo(id,format,date_pub,column,writer_prefer,writer_avoid);
         }
         catch (Exception e){
             System.out.println(e);
@@ -266,6 +265,17 @@ public class ContributeServiceimpl implements ContributeService{
     public Integer uploadSchedule(String title,Date date_pub){
         try{
             return contributeMapper.uploadSchedule(title,date_pub);
+        }
+        catch (Exception e){
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    @Override
+    public Object getInfoByRoleId(int stat,int name,int id_role){
+        try{
+            return contributeMapper.getInfoByRoleId(stat,name,id_role);
         }
         catch (Exception e){
             System.out.println(e);

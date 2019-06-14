@@ -240,10 +240,6 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
-<<<<<<< HEAD
-=======
-    @Cacheable(cacheNames= "AnnouncementList",key="#num")
->>>>>>> c9112ba572c2fc5b7756324a77649e81bfe305a2
     public Map<String, Object> GetAnnouncementList(int num) {
         List<HashMap<String, Object>> announcementlist;
         Map<String, Object> map = new HashMap<>();
@@ -315,12 +311,7 @@ public class CommonServiceImpl implements CommonService{
      * @return
      */
     @Override
-<<<<<<< HEAD
     public Map<String, Object> GetArticleList(int num) {
-=======
-    @Cacheable(cacheNames= "LatestArticleList",key="#num")
-    public Map<String, Object> GetLatestArticleList(int num) {
->>>>>>> c9112ba572c2fc5b7756324a77649e81bfe305a2
         List<HashMap<String, Object>> articlelist;
         Map<String, Object> map = new HashMap<>();
         int result = 0;

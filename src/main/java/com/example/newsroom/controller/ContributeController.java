@@ -2,6 +2,7 @@ package com.example.newsroom.controller;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.example.newsroom.entity.*;
 import com.example.newsroom.service.ContributeService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -38,9 +39,9 @@ public class ContributeController {
     public Object upload_allocate_Article(@RequestParam(value = "all") String _all, @RequestParam(value = "file1") MultipartFile file1, @RequestParam(value = "file2") MultipartFile file2, HttpSession session){
         All all = JSON.parseObject(_all,All.class);
         Article article = all.getArticle();
-        article.setDate_sub(new Date());
         if(article != null){
             article.setWriter_id((int)session.getAttribute("id"));
+            article.setDate_sub(new Date());
         }
         Task task = all.getTask();
         if(task != null){
@@ -143,7 +144,7 @@ public class ContributeController {
             }
             if(result != null && result == 1 && format[0] != _format){
                 format[0] = _format;
-                result = contributeService.updateArticleInfo(article.getId(),format[0] + ";" + format[1],null,0);
+                result = contributeService.updateArticleInfo(article.getId(),format[0] + ";" + format[1],null,0,null,null);
                 if(result != null && result == 1){
                     data = "";
                 }
@@ -351,6 +352,8 @@ public class ContributeController {
     public Object getTask(@RequestBody All all,HttpSession session){
         int id_role = (int)session.getAttribute("id");
         int role = (int)session.getAttribute("role");
+//        int id_role = all.getId_role()[0];
+//        int role = all.getRole();
         int stat = all.getStat();
         int flag = all.getFlag();
         int page = all.getPage();
@@ -473,15 +476,38 @@ public class ContributeController {
         Integer result = 1;
         List<Map<String,Object>> data = null;
         data = contributeService.getAllByTable(resource.getFunc());
-        if(all.getResource().getFunc().equals("editors") || all.getResource().getFunc().equals("professors")){
+        if(resource.getFunc().equals("editors") || resource.getFunc().equals("professors")){
+            if(resource.getFunc().equals("professors") && resource.getId_article() != 0){
+                String t = contributeService.getArticleById(resource.getId_article()).getWriter_avoid();
+                if(t != null && t != ""){
+                    String[] avoid = t.split(";");
+                    for(int i = 0;i < avoid.length;i++){
+                        for(int j = 0;j < data.size();j++){
+                            if(Integer.valueOf(data.get(j).get("id").toString()) == Integer.valueOf(avoid[i])){
+                                data.remove(j);
+                            }
+                        }
+                    }
+                }
+            }
             for(int i = 0;i < data.size();i++){
-                data.get(i).remove("password");
-                data.get(i).remove("safeque1");
-                data.get(i).remove("safeque2");
-                data.get(i).remove("safeque3");
+                if((int)session.getAttribute("role") == 4 && (int)session.getAttribute("id") == Integer.valueOf(data.get((i)).get("id").toString())){
+                    data.remove(i);
+                    i--;
+                }
+                else if(resource.getAcademicsec() == 0 || (data.get(i).get("academicsec1") != null && Integer.valueOf(data.get(i).get("academicsec1").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec2") != null && Integer.valueOf(data.get(i).get("academicsec2").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec3") != null && Integer.valueOf(data.get(i).get("academicsec3").toString()) == resource.getAcademicsec())){
+                    data.get(i).remove("password");
+                    data.get(i).remove("safeque1");
+                    data.get(i).remove("safeque2");
+                    data.get(i).remove("safeque3");
+                }
+                else{
+                    data.remove(i);
+                    i--;
+                }
             }
         }
-        else if(all.getResource().getFunc().equals("newsroominfo")){
+        else if(resource.getFunc().equals("newsroominfo")){
             for(int i = 0;i < data.size();i++){
                 data.get(i).remove("admin");
                 data.get(i).remove("password");
@@ -542,11 +568,9 @@ public class ContributeController {
     @PostMapping(value = "/task/judge")
     public Object judgeArticle(@RequestBody All all, HttpSession session) {
         Task task = all.getTask();
-        //task.setId_role((int)session.getAttribute("id"));
-        //task.setRole((int)session.getAttribute("role"));
         int[] id_role = all.getId_role();
         Map<String, Object> map = new HashMap<>();
-        Integer result = 0;
+        Integer result = 1;
         String data = null;
         //result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),1,null);
         if(task.getStat() == 0){//初审通过
@@ -557,38 +581,83 @@ public class ContributeController {
         }
         else if(task.getContent() != null){//审稿人提交审稿意见
             result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),1,new Date());
+            result = contributeService.updateArticleInfo(task.getId_article(),null,null,0,null,task.getId_role() + ";");
             if(result != null && result == 1){
                 data = "";
-                result = contributeService.checkTaskLink(task.getId_article(),-1, 0,0);
-                if(result == 0){//所有审稿人完成审稿
-                    task.setId_role(contributeService.getRoleIdByTask(task.getId_article(), task.getRole()).get(0));
-                    String content  = new String();
-                    List<Integer> professors = contributeService.getRoleIdByTask(task.getId_article(),4);
-                    for(int i = 0;i < professors.size();i++){
-                        content += professors.get(i) + ":" + contributeService.getContentByRoleId(professors.get(i)) + ";";
-                    }
-                    task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
-                    result = contributeService.checkTaskLink(task.getId_article(),1, 3,1);
-                    if(result != 0){
-                        task.setStat(7);
-                    }
-                    else{
+                if(id_role != null){//需要转送
+                    if(id_role[0] != 0){//转送到审稿人
+                        task.setContent(null);
+                        task.setId_role(id_role[0]);
                         task.setStat(1);
+                        task.setDate(new Date());
+                        result = contributeService.createTask(task);
                     }
-                    task.setRole(3);
-                    task.setContent(content);
-                    task.setDate(new Date());
-                    result = contributeService.createTask(task);
+                    else{//转送到学术领域
+                        result = contributeService.updateArticleInfo(task.getId_article(),null,null,0,id_role[1] + ";",null);
+                        if(result != null && result == 1){
+                            task.setContent(String.valueOf(id_role[1]));
+                            task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
+                            task.setStat(1);
+                            task.setRole(3);
+                            task.setDate(new Date());
+                            result = contributeService.createTask(task);
+                        }
+                        else{
+                            result = 0;
+                            data = "Update Failed";
+                        }
+                    }
                     if(result != null && result == 1){
                         data = "";
                     }
                     else{
                         result = 0;
-                        data = "Insert Failed";
+                        if(data != null){
+                            data = "Insert Failed";
+                        }
                     }
                 }
-                else{
-                    result = 1;
+                if(result == 1){
+                    result = contributeService.checkTaskLink(task.getId_article(),-1,0,0);
+                    if(result == 0){//所有审稿人完成审稿
+                        task.setId_role(contributeService.getRoleIdByTask(task.getId_article(), task.getRole()).get(0));
+                        String content  = new String();
+                        int stat = 4;
+                        List<Integer> professors = contributeService.getRoleIdByTask(task.getId_article(),4);
+                        content += "[";
+                        for(int i = 0;i < professors.size();i++){
+                            content += "{\"name\":" + "\"" + contributeService.getInfoByRoleId(0,1,professors.get(i)).toString() + "\"" + "," + "\"content\":" + contributeService.getContentByRoleId(professors.get(i)) + "}";
+                            if(Integer.valueOf(contributeService.getInfoByRoleId(1,0,professors.get(i)).toString()) < stat){
+                                stat = Integer.valueOf(contributeService.getInfoByRoleId(1,0,professors.get(i)).toString());
+                            }
+                            if(i != professors.size() - 1){
+                                content += ",";
+                            }
+                        }
+                        content += "]";
+                        task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
+                        result = contributeService.checkTaskLink(task.getId_article(),1,3,1);
+                        if(result != 0){//重审完成
+                            task.setStat(7);
+                        }
+                        else{//首次审稿完成
+                            task.setStat(stat);
+                        }
+                        task.setRole(3);
+                        task.setContent(content);
+                        task.setDate(new Date());
+                        result = contributeService.createTask(task);
+                        if(result != null && result == 1){
+                            data = "";
+                        }
+                        else{
+                            result = 0;
+                            data = "Insert Failed";
+                        }
+                    }
+                    else{
+                        result = 1;
+                    }
                 }
             }
             else{
@@ -597,14 +666,23 @@ public class ContributeController {
             }
         }
         else if(task.getStat() == 1){//首审稿件分配
-            if(task.getRole() == 3){
+            if(task.getRole() == 3){//审稿人拒绝
+                result = contributeService.updateArticleInfo(task.getId_article(),null,null,0,null,task.getId_role() + ";");
                 task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
             }
-            result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),0,new Date());
+            if(result != null && result == 1){
+                result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),0,new Date());
+            }
+            else{
+                result = 0;
+                data = "Insert Failed";
+            }
         }
         else if(task.getStat() == 7){//重审稿件分配
-            for(int i = 0;i < id_role.length;i++){
-                task.setId_role(id_role[i]);
+            result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),1,new Date());
+            List<Integer> professors = contributeService.getRoleIdByTask(task.getId_article(),4);
+            for(int i = 0;i < professors.size();i++){
+                task.setId_role(professors.get(i));
                 task.setRole(4);
                 task.setDate(new Date());
                 result = contributeService.createTask(task);
@@ -875,7 +953,7 @@ public class ContributeController {
                 }
                 else{//版面费审核通过
                     task.setDate(new Date());
-                    result = contributeService.createTask(task);
+                    result = contributeService.updateTask(task.getId(),task.getId_role(),task.getContent(),task.getStat(),task.getRole(),1,task.getDate());
                 }
                 if(result != null && result == 1){
                     data = "";
@@ -982,7 +1060,12 @@ public class ContributeController {
                 task.setDate(new Date());
                 result = contributeService.createTask(task);
             }
-            else if(stat == 4 || stat == 5){
+            else if(stat == 4){
+                task.setStat(8);
+                task.setDate(new Date());
+                result = contributeService.createTask(task);
+            }
+            else if(stat == 5){
                 task.setStat(stat);
                 task.setDate(new Date());
                 result = contributeService.createTask(task);
@@ -1040,7 +1123,7 @@ public class ContributeController {
         }
         if(result != null && result == 1 && format[0] != _format){
             format[0] = _format;
-            result = contributeService.updateArticleInfo(article.getId(),format[0] + ";" + format[1],null,0);
+            result = contributeService.updateArticleInfo(article.getId(),format[0] + ";" + format[1],null,0,null,null);
             if(result != null && result == 1){
                 data = "";
             }
@@ -1105,7 +1188,7 @@ public class ContributeController {
         }
         if(stat == 5){
             task.setId_role(contributeService.getRoleIdByTask(task.getId_article(),3).get(0));
-            task.setStat(4);
+            task.setStat(8);
             task.setRole(3);
             task.setDate(new Date());
             result = contributeService.createTask(task);

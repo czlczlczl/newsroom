@@ -7,7 +7,7 @@ import com.example.newsroom.entity.Task;
 import java.util.*;
 
 public interface ContributeService {
-    Integer updateArticleInfo(int id,String format,Date date_pub,int column);
+    Integer updateArticleInfo(int id,String format,Date date_pub,int column,String writer_prefer,String writer_avoid);
     Integer deleteArticleInfo(int id);
     Integer uploadArticleInfo(Article article);
     Integer updateTask(int id,int id_role,String content,int stat,int role,int flag,Date date);
@@ -30,4 +30,5 @@ public interface ContributeService {
     Integer getEditorByAcadamic(int id);
     Integer checkTaskLink(int id_article,int stat, int role,int flag);
     Integer uploadSchedule(String title,Date date_pub);
+    Object getInfoByRoleId(int stat,int name,int id_role);
 }

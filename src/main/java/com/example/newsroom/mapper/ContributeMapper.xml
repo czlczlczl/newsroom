@@ -14,6 +14,12 @@
             <if test="column != 0">
                 `column` = #{column},
             </if>
+            <if test="writer_prefer">
+                `writer_prefer` = CONCAT(`writer_prefer`,#{writer_prefer}),
+            </if>
+            <if test="writer_avoid != null">
+                `writer_avoid` = CONCAT(`writer_avoid`,#{writer_avoid}),
+            </if>
         </set>
         WHERE id = #{id}
     </update>
@@ -411,5 +417,15 @@
     <update id="uploadSchedule">
         UPDATE articles SET date_pub = #{date_pub} WHERE title = #{title}
     </update>
+
+    <select id="getInfoByRoleId" resultType="java.lang.Object">
+        SELECT
+        <if test="stat == 1">
+            stat FROM tasks WHERE id_role = #{id_role} AND role = 4 ORDER BY id DESC LIMIT 0,1
+        </if>
+        <if test="name == 1">
+            name FROM professors WHERE id = #{id_role}
+        </if>
+    </select>
 
 </mapper>
