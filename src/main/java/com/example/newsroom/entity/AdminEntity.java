@@ -9,6 +9,7 @@ public class AdminEntity {
     private int id;
     private String title;//公告标题
     private String academicsec;//学术领域名称
+    private int editorId;//学术领域对应的编辑
     private String column;//栏目名称
     private String name;//首页横向版面名称
     private String content;//首页横向版面说明
@@ -30,6 +31,14 @@ public class AdminEntity {
 
     public void setAcademicsec(String academicsec) {
         this.academicsec = academicsec;
+    }
+
+    public int getEditorId() {
+        return editorId;
+    }
+
+    public void setEditorId(int editorId) {
+        this.editorId = editorId;
     }
 
     public String getTitle() {

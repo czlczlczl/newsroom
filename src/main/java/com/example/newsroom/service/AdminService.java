@@ -30,9 +30,9 @@ public interface AdminService {
 
     Map<String, Object> CreateUser(JSONObject user, int role);
 
-    Map<String, Object> CreateAcademicsec(String academicsec);
+    Map<String, Object> CreateAcademicsec(String academicsec, int editorId);
 
-    Map<String, Object> UpdateAcademicsec(String academicesc, int id);
+    Map<String, Object> UpdateAcademicsec(String academicesc, int id, int editorId);
 
     Map<String, Object> GetAcademicsecById(int id);
 

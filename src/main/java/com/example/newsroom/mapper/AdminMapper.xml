@@ -366,8 +366,8 @@
         </if>
     </insert>
 
-    <insert id="CreateAcademicsec" parameterType="java.lang.String" >
-        INSERT INTO type_academicsec(academicsec) VALUE (#{academicsec});
+    <insert id="CreateAcademicsec">
+        INSERT INTO type_academicsec(academicsec,id_editor) VALUE (#{academicsec},#{editorId});
     </insert>
 
     <select id="SelectAcademicsec" parameterType="java.lang.String" resultType="java.lang.Integer">
@@ -391,7 +391,7 @@
     </select>
 
     <update id="UpdateAcademicsec">
-        UPDATE type_academicsec set academicsec = #{academicsec} where id = #{id};
+        UPDATE type_academicsec set academicsec = #{academicsec},id_editor = #{editorId} where id = #{id};
     </update>
 
     <insert id="CreateColumn" parameterType="java.lang.String" >

@@ -39,7 +39,6 @@ com\example\newsroom\service\ManageService.class
 com\example\newsroom\entity\All.class
 com\example\newsroom\util\SessionError.class
 com\example\newsroom\entity\Standard.class
-com\example\newsroom\controller\testcontroller.class
 com\example\newsroom\service\impl\Testserviceimpl.class
 com\example\newsroom\service\impl\MailServiceImpl.class
 com\example\newsroom\service\impl\ManageServiceImpl.class

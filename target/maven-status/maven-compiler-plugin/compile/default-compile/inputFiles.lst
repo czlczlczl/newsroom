@@ -50,8 +50,8 @@ C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后�
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\service\impl\Testserviceimpl.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\dao\testmapper.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Certificate.java
+C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Common.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Standard.java
-C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\controller\testcontroller.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Professor_.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Article.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\controller\CommonController.java
@@ -65,3 +65,4 @@ C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后�
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\service\CommonService.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\All.java
 C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\FriendLink.java
+C:\Users\比企谷雪乃\Desktop\编辑部\onlineSubmissionSystem\newsroom(后端)redis版\src\main\java\com\example\newsroom\entity\Manage.java

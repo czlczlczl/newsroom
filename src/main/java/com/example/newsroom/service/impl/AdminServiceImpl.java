@@ -296,15 +296,14 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
-
-    public Map<String, Object> CreateAcademicsec(String academicsec) {
+    public Map<String, Object> CreateAcademicsec(String academicsec, int editorId) {
         Map<String, Object> map = new HashMap<>();
         Integer res = null;
         int result = 0;
 
         Integer ad = adminMapper.SelectAcademicsec(academicsec);
         if(ad == null) {
-            res = adminMapper.CreateAcademicsec(academicsec);
+            res = adminMapper.CreateAcademicsec(academicsec,editorId);
         }else {
             map.put("error","已有此学术领域");
         }
@@ -323,11 +322,11 @@ public class AdminServiceImpl implements AdminService{
      * @return
      */
     @Override
-    public Map<String, Object> UpdateAcademicsec(String academicsec, int id) {
+    public Map<String, Object> UpdateAcademicsec(String academicsec, int id, int editorId) {
         Map<String, Object> map = new HashMap<>();
         Integer res;
         int result = 0;
-        res = adminMapper.UpdateAcademicsec(academicsec,id);
+        res = adminMapper.UpdateAcademicsec(academicsec,id,editorId);
 
         if(res != null){
             result = 1;

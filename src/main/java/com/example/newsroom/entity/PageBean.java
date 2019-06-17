@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class PageBean {
     private int currentPage = 1;//当前页码,默认为1
-    private int pageSize = 2;//每页显示的记录数,默认为10
+    private int pageSize = 10;//每页显示的记录数,默认为10
     private int total;//总记录数
     private int totalPage;//总页数
     private int startIndex;//开始索引，从数据库中第几行拿

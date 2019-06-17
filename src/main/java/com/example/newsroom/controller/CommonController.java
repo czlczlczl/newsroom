@@ -1,6 +1,7 @@
 package com.example.newsroom.controller;
 
 import com.example.newsroom.entity.Author;
+import com.example.newsroom.entity.Common;
 import com.example.newsroom.model.ResetPwd;
 import com.example.newsroom.model.SafeAnswer;
 import com.example.newsroom.model.UserLogin;
@@ -33,8 +34,8 @@ public class CommonController {
      * @return
      */
     @PostMapping(value = "/register/isemailexist")
-    public Object IsEmailExist(@RequestParam(value = "email") String email){
-        return commonService.IsEmailExist(email);
+    public Object IsEmailExist(@RequestBody Common email){
+        return commonService.IsEmailExist(email.getEmail());
     }
 
     /**

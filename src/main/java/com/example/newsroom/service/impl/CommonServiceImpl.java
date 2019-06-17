@@ -38,11 +38,11 @@ public class CommonServiceImpl implements CommonService{
     public Map<String, Object> IsEmailExist(String email) {
         Integer exist;
         Map<String, Object> map = new HashMap<>();
-        int result = 1;
+        int result = 0;
 
         exist = commonMapper.IsEmailExist(email);
         if(exist != null){
-            result = 0;
+            result = 1;
         }
         map.put("result",result);
         return map;
@@ -160,10 +160,12 @@ public class CommonServiceImpl implements CommonService{
         String safeque2[] = b.split(":");
         String safeque3[] = c.split(":");
 
-        que.put("que1",commonMapper.GetQueById(Integer.valueOf(safeque1[0])));
-        que.put("que2",commonMapper.GetQueById(Integer.valueOf(safeque2[0])));
-        que.put("que3",commonMapper.GetQueById(Integer.valueOf(safeque3[0])));
-
+        que.put("que1",safeque1[0]);
+        que.put("que2",safeque2[0]);
+        que.put("que3",safeque3[0]);
+//        que.put("que1",commonMapper.GetQueById(Integer.valueOf(safeque1[0])));
+//        que.put("que2",commonMapper.GetQueById(Integer.valueOf(safeque2[0])));
+//        que.put("que3",commonMapper.GetQueById(Integer.valueOf(safeque3[0])));
         map.put("safeque",que);
         return map;
     }
@@ -184,9 +186,9 @@ public class CommonServiceImpl implements CommonService{
         String b = (String)safeque.get("safeque2");
         String c = (String)safeque.get("safeque3");
 
-        String safeque1[] = a.split(";");
-        String safeque2[] = b.split(";");
-        String safeque3[] = c.split(";");
+        String safeque1[] = a.split(":");
+        String safeque2[] = b.split(":");
+        String safeque3[] = c.split(":");
 
         if(safeAnswer.getAnswer1().equals(safeque1[1]) && safeAnswer.getAnswer2().equals(safeque2[1]) && safeAnswer.getAnswer3().equals(safeque3[1])){
             result = 1;

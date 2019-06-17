@@ -37,11 +37,11 @@ public interface AdminMapper {
 
     Integer CreateUser(@Param(value = "user")Object user, @Param(value = "role")int role );
 
-    Integer CreateAcademicsec(@Param(value = "academicsec")String academicsec);
+    Integer CreateAcademicsec(@Param(value = "academicsec")String academicsec, @Param(value = "editorId")int editorId);
 
     Integer SelectAcademicsec(@Param(value = "academicsec")String academicsec);
 
-    Integer UpdateAcademicsec(@Param(value = "academicsec")String academicsec, @Param(value = "id")int id);
+    Integer UpdateAcademicsec(@Param(value = "academicsec")String academicsec, @Param(value = "id")int id, @Param(value = "editorId")int editorId);
 
     List<HashMap<String,Object>> GetAcademicsecById(@Param(value = "id")int id);
 

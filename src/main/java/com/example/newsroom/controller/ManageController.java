@@ -3,6 +3,7 @@ package com.example.newsroom.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.newsroom.entity.Author;
+import com.example.newsroom.entity.Manage;
 import com.example.newsroom.model.*;
 import com.example.newsroom.service.ManageService;
 import com.example.newsroom.util.Sha256;
@@ -28,9 +29,9 @@ public class ManageController {
      * @return
      */
     @PostMapping(value = "/resetpwd")
-    public Object ResetPassword(@RequestParam(value = "oldpwd") String oldpwd, @RequestParam(value = "newpwd") String newpwd, HttpSession httpSession){
-        oldpwd = Sha256.getSHA256StrJava(httpSession.getAttribute(WebSecurityConfig.SESSION_USERNAME) + oldpwd);
-        newpwd = Sha256.getSHA256StrJava(httpSession.getAttribute(WebSecurityConfig.SESSION_USERNAME) + newpwd);
+    public Object ResetPassword(@RequestBody Manage manage, HttpSession httpSession){
+        String oldpwd = Sha256.getSHA256StrJava(httpSession.getAttribute(WebSecurityConfig.SESSION_USERNAME) + manage.getOldpwd());
+        String newpwd = Sha256.getSHA256StrJava(httpSession.getAttribute(WebSecurityConfig.SESSION_USERNAME) + manage.getNewpwd());
 
         return manageService.ResetPassword(oldpwd, newpwd, (String) httpSession.getAttribute(WebSecurityConfig.SESSION_USERNAME), (int)httpSession.getAttribute(WebSecurityConfig.SESSION_ROLE));
     }

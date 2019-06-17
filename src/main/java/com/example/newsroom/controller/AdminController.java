@@ -348,7 +348,7 @@ public class AdminController {
             return map;
         }
 
-        return adminService.CreateAcademicsec(adminEntity.getAcademicsec());
+        return adminService.CreateAcademicsec(adminEntity.getAcademicsec(),adminEntity.getEditorId());
     }
 
     /**
@@ -380,7 +380,7 @@ public class AdminController {
             return map;
         }
 
-        return adminService.UpdateAcademicsec(adminEntity.getAcademicsec(),adminEntity.getId());
+        return adminService.UpdateAcademicsec(adminEntity.getAcademicsec(),adminEntity.getId(),adminEntity.getEditorId());
     }
 
     /**

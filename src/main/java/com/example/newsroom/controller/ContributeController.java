@@ -490,21 +490,31 @@ public class ContributeController {
                     }
                 }
             }
-            for(int i = 0;i < data.size();i++){
-                if((int)session.getAttribute("role") == 4 && (int)session.getAttribute("id") == Integer.valueOf(data.get((i)).get("id").toString())){
-                    data.remove(i);
-                    i--;
-                }
-                else if(resource.getAcademicsec() == 0 || (data.get(i).get("academicsec1") != null && Integer.valueOf(data.get(i).get("academicsec1").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec2") != null && Integer.valueOf(data.get(i).get("academicsec2").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec3") != null && Integer.valueOf(data.get(i).get("academicsec3").toString()) == resource.getAcademicsec())){
-                    data.get(i).remove("password");
-                    data.get(i).remove("safeque1");
-                    data.get(i).remove("safeque2");
-                    data.get(i).remove("safeque3");
-                }
-                else{
-                    data.remove(i);
-                    i--;
-                }
+            if(resource.getFunc().equals("professors")){
+              for(int i = 0;i < data.size();i++){
+                  if((int)session.getAttribute("role") == 4 && (int)session.getAttribute("id") == Integer.valueOf(data.get((i)).get("id").toString())){
+                      data.remove(i);
+                      i--;
+                  }
+                  else if(resource.getAcademicsec() == 0 || (data.get(i).get("academicsec1") != null && Integer.valueOf(data.get(i).get("academicsec1").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec2") != null && Integer.valueOf(data.get(i).get("academicsec2").toString()) == resource.getAcademicsec()) || (data.get(i).get("academicsec3") != null && Integer.valueOf(data.get(i).get("academicsec3").toString()) == resource.getAcademicsec())){
+                      data.get(i).remove("password");
+                      data.get(i).remove("safeque1");
+                      data.get(i).remove("safeque2");
+                      data.get(i).remove("safeque3");
+                  }
+                  else{
+                      data.remove(i);
+                      i--;
+                  }
+              }
+            }
+            if(resource.getFunc().equals("editors")){
+              for(int i = 0;i < data.size();i++){
+                data.get(i).remove("password");
+                data.get(i).remove("safeque1");
+                data.get(i).remove("safeque2");
+                data.get(i).remove("safeque3");
+              }
             }
         }
         else if(resource.getFunc().equals("newsroominfo")){
