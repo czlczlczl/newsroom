@@ -14,11 +14,11 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/file")
 public class FileController {
-    public static final String artpath = "./file/upload";//文章
-    public static final String anattapath = "./file/AnnouncementAnnexes";//公告附件
-    public static final String anpicpath = "./file/AnnouncementPic";//公告图片
-    public static final String infocenterpath = "./file/InfoCenter";//资料中心
-    public static final String certificatepath = "./file/Certificate";//证书
+    public static final String artpath = "/file/upload";//文章
+    public static final String anattapath = "/file/AnnouncementAnnexes";//公告附件
+    public static final String anpicpath = "/file/AnnouncementPic";//公告图片
+    public static final String infocenterpath = "/file/InfoCenter";//资料中心
+    public static final String certificatepath = "/file/Certificate";//证书
 
     @Autowired
     CommonMapper commonMapper;
