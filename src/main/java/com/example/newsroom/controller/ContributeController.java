@@ -1510,7 +1510,8 @@ public class ContributeController {
         response.setContentType("application/octet-stream");
         FileInputStream fis = null;
         try{
-            File file = new File("./file/upload/" + filename);
+            File file = new File("/file/upload/" + filename);
+//            File file = new File("./file/upload/" + filename);
             if(!file.exists()){
                 response.setStatus(404);
             }
